@@ -3,9 +3,8 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true  // ✅ ИГНОРИРУЕМ TS ошибки!
   },
-  eslint: {
-    ignoreDuringBuilds: true  // ✅ ИГНОРИРУЕМ ESLint warnings!
-  },
+  //eslint: {     ignoreDuringBuilds: true }, // ✅ ИГНОРИРУЕМ ESLint warnings! 
+  
   images: {
     remotePatterns: [{ protocol: 'https', hostname: '**' }]
   }

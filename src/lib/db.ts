@@ -1,7 +1,11 @@
 import fs from 'fs';
 import path from 'path';
+import { Low } from 'lowdb';  // ← Low КЛАСС
+import { JSONFile } from 'lowdb/node';  // ← АДАПТЕР
 
-const dbPath = path.join(process.cwd(), 'db.json');
+const dbPath = path.join(process.cwd(), 'db.json');  // ← data/db.json
+const adapter = new JSONFile(dbPath);  // ← НОВЫЙ адаптер
+export const db = new Low(adapter, {});  // ← Low(адаптер, дефолт)
 
 // ✅ getDb = loadDb (алиас для совместимости)
 export const getDb = (): any => {
@@ -25,3 +29,5 @@ export const saveDb = (data: any): boolean => {
     return false;
   }
 };
+
+export default db;
