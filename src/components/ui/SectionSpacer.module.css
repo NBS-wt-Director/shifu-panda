@@ -1,0 +1,22 @@
+.spacer {
+    width: 100%;
+  }
+  
+  .sm { height: 2rem; }
+  .md { height: 4rem; }
+  .lg { height: 6rem; }
+  .xl { height: 8rem; }
+  .xs { height: 1rem; }
+  
+  .gradientBlue {
+    background: linear-gradient(to right, #eff6ff, #dbeafe);
+  }
+  
+  .gradientGreen {
+    background: linear-gradient(to right, #ecfdf5, #d1fae5);
+  }
+  
+  .default {
+    background: linear-gradient(to bottom, #f8fafc, #ffffff);
+  }
+  

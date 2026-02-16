@@ -1,0 +1,33 @@
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgb(248, 250, 252) 0%, rgb(241, 245, 249) 100%);
+    border-radius: 1.5rem;
+    border: 1px solid rgb(229, 231, 235);
+  }
+  
+  .tabButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 1rem;
+    font-weight: 600;
+    height: auto;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+  }
+  
+  .tabButton[data-state='open'] {
+    background: linear-gradient(to right, rgb(251, 191, 36), rgb(234, 179, 8));
+    color: rgb(17, 24, 39);
+    box-shadow: 0 10px 25px rgba(251, 191, 36, 0.3);
+  }
+  
+  .tabIcon {
+    font-size: 1.25rem;
+  }
+  

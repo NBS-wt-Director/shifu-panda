@@ -1,8 +1,10 @@
+
 'use client';
 import { useEffect, useState } from 'react';
-import { X, CheckCircle, Loader2, Image as ImageIcon } from 'lucide-react';
+import { X, CheckCircle, Loader2 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import FullScreenImageModal from '@/components/ui/FullScreenImageModal'; // ✅ МОДАЛКА
 import { notFound } from 'next/navigation';
 
 interface Trainer {
@@ -20,14 +22,21 @@ interface Trainer {
   }>;
 }
 
+interface Photo {
+  image: string;
+  caption: string;
+}
+
 export default function TrainerPage({ params }: { params: Promise<{ id: string }> }) {
   const [trainer, setTrainer] = useState<Trainer | null>(null);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ name: '', phone: '', email: '', message: '' });
   const [formReason, setFormReason] = useState('');
+  
+  // ✅ МОДАЛКА ФОТО
+  const [imageModal, setImageModal] = useState({ open: false, url: '', alt: '' });
 
-  // Загрузка данных тренера
   useEffect(() => {
     const loadTrainer = async () => {
       const { id } = await params;
@@ -40,31 +49,24 @@ export default function TrainerPage({ params }: { params: Promise<{ id: string }
           setTrainer(data);
           setFormReason(`записаться к тренеру "${data.name}"`);
           setLoading(false);
-          
-          if (data.isDemo) {
-            console.warn('⚠️ Демо-режим тренера:', data.name);
-          }
         })
         .catch(err => {
           console.error('❌ Ошибка загрузки тренера:', err);
           setLoading(false);
         });
     };
-
     loadTrainer();
   }, [params]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const submitData = { ...formData, reason: formReason };
-
     try {
       const res = await fetch('/api/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(submitData)
       });
-      
       if (res.ok) {
         setShowForm(false);
         setFormData({ name: '', phone: '', email: '', message: '' });
@@ -73,6 +75,11 @@ export default function TrainerPage({ params }: { params: Promise<{ id: string }
     } catch {
       alert('Ошибка отправки');
     }
+  };
+
+  // ✅ ОТКРЫТИЕ ФОТО В МОДАЛКЕ
+  const openImageModal = (url: string, alt: string) => {
+    setImageModal({ open: true, url, alt });
   };
 
   if (loading) {
@@ -92,79 +99,84 @@ export default function TrainerPage({ params }: { params: Promise<{ id: string }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-      {/* Основная информация: ИМЯ + ОПИСАНИЕ + ФОТО (один под другим) */}
-<section className="pt-24 pb-20 bg-gradient-to-br from-yellow-50 to-orange-50">
-  <div className="max-w-4xl mx-auto px-4">
-    {/* Предупреждение о демо-режиме */}
-    {trainer.isDemo && (
-      <div className="bg-yellow-100 border-2 border-yellow-300 text-yellow-800 px-8 py-6 rounded-3xl max-w-4xl mx-auto mb-12 text-center shadow-lg mb-16">
-        <div className="text-2xl font-bold mb-4">⚠️ Демо-режим</div>
-        <p className="text-xl">{trainer.description}</p>
-      </div>
-    )}
-        {/* ГЛАВНОЕ ФОТО (полная ширина) */}
-        <div className="max-w-4xl mx-auto">
-      <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden">
-        <img 
-          src={trainer.image} 
-          alt={trainer.name}
-          className="w-full h-[500px] md:h-[600px] object-contain bg-gradient-to-br from-gray-100 to-gray-200"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800";
-          }}
-        />
-      </div>
-    </div>
-   {/* ИМЯ + ОПИСАНИЕ (слева, выровнено по левому краю) */}
-<div className="text-left mb-16 space-y-8 max-w-2xl">
-  <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent drop-shadow-2xl">
-    {trainer.name}
-  </h1>
-  <div 
-    className="text-xl md:text-2xl text-gray-700 leading-relaxed whitespace-pre-wrap break-words"
-    dangerouslySetInnerHTML={{ __html: trainer.description }}  // ✅ Сохраняет табуляцию, переносы, HTML
-  />
-</div>
-
-  </div>
-</section>
-
+      {/* ✅ Header С ИМЕНЕМ ТРЕНЕРА */}
+      <Header pageTitle={trainer.name} />
       
- {/* Фотогалерея - БЕЗ обрезки */}
-{trainer.photoAlbum && trainer.photoAlbum.length > 0 && (
-  <section className="py-24 bg-white">
-    <div className="max-w-7xl mx-auto px-4">
-      <h2 className="text-4xl md:text-5xl font-black text-center mb-20 bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent drop-shadow-2xl">
-        📸 Фотоальбом
-      </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {trainer.photoAlbum.map((photo, idx) => (
-          <div key={idx} className="group relative bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-3 overflow-hidden">
-            {/* Фото БЕЗ обрезки */}
-            <div className="w-full h-80 p-4 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-t-3xl">
+      {/* Основная информация */}
+      <section className="pt-24 pb-20 bg-gradient-to-br from-yellow-50 to-orange-50">
+        <div className="max-w-4xl mx-auto px-4">
+          {trainer.isDemo && (
+            <div className="bg-yellow-100 border-2 border-yellow-300 text-yellow-800 px-8 py-6 rounded-3xl max-w-4xl mx-auto mb-12 text-center shadow-lg mb-16">
+              <div className="text-2xl font-bold mb-4">⚠️ Демо-режим</div>
+              <p className="text-xl">{trainer.description}</p>
+            </div>
+          )}
+          
+          {/* ✅ ГЛАВНОЕ ФОТО - КЛИКАбельное */}
+          <div className="max-w-4xl mx-auto mb-16">
+            <div 
+              className="relative bg-white rounded-3xl shadow-2xl overflow-hidden cursor-pointer hover:shadow-3xl transition-all duration-300 hover:scale-[1.02]"
+              onClick={() => openImageModal(trainer.image, trainer.name)}
+            >
               <img 
-                src={photo.image} 
-                alt={photo.caption}
-                className="w-full h-full max-h-72 object-contain rounded-2xl shadow-lg group-hover:scale-105 transition-transform duration-500 max-w-full"
+                src={trainer.image} 
+                alt={trainer.name}
+                className="w-full h-[500px] md:h-[600px] object-contain bg-gradient-to-br from-gray-100 to-gray-200"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400";
+                  (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800";
                 }}
               />
             </div>
-            
-            {/* Подпись */}
-            <div className="p-6">
-              <p className="font-semibold text-lg text-gray-800 line-clamp-2 group-hover:text-yellow-600 transition-colors">
-                {photo.caption}
-              </p>
+          </div>
+
+          {/* ИМЯ + ОПИСАНИЕ */}
+          <div className="text-left mb-16 space-y-8 max-w-2xl">
+            <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent drop-shadow-2xl">
+              {trainer.name}
+            </h1>
+            <div 
+              className="text-xl md:text-2xl text-gray-700 leading-relaxed whitespace-pre-wrap break-words"
+              dangerouslySetInnerHTML={{ __html: trainer.description }}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ✅ Фотогалерея - ВСЕ КЛИКАбельные */}
+      {trainer.photoAlbum && trainer.photoAlbum.length > 0 && (
+        <section className="py-24 bg-white">
+          <div className="max-w-7xl mx-auto px-4">
+            <h2 className="text-4xl md:text-5xl font-black text-center mb-20 bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent drop-shadow-2xl">
+              📸 Фотоальбом
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {trainer.photoAlbum.map((photo: Photo, idx: number) => (
+                <div 
+                  key={idx} 
+                  className="group relative bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-3 overflow-hidden cursor-pointer"
+                  onClick={() => openImageModal(photo.image, photo.caption)}
+                >
+                  <div className="w-full h-80 p-4 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-t-3xl">
+                    <img 
+                      src={photo.image} 
+                      alt={photo.caption}
+                      className="w-full h-full max-h-72 object-contain rounded-2xl shadow-lg group-hover:scale-105 transition-transform duration-500 max-w-full"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400";
+                      }}
+                    />
+                  </div>
+                  <div className="p-6">
+                    <p className="font-semibold text-lg text-gray-800 line-clamp-2 group-hover:text-yellow-600 transition-colors">
+                      {photo.caption}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
-    </div>
-  </section>
-)}
+        </section>
+      )}
 
       {/* Расписание тренировок */}
       {trainer.workouts && trainer.workouts.length > 0 && (
@@ -280,6 +292,14 @@ export default function TrainerPage({ params }: { params: Promise<{ id: string }
           </div>
         </div>
       )}
+
+      {/* ✅ МОДАЛКА ФОТО */}
+      <FullScreenImageModal 
+        isOpen={imageModal.open}
+        imageUrl={imageModal.url}
+        alt={imageModal.alt}
+        onClose={() => setImageModal({ open: false, url: '', alt: '' })}
+      />
 
       <Footer />
     </div>

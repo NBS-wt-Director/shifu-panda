@@ -1,12 +1,18 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Loader2, Image as ImageIcon } from 'lucide-react';
+import { Loader2, ImageIcon } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import SectionSpacer from '@/components/ui/SectionSpacer';
+import FullScreenImageModal from '@/components/ui/CallModal'; // ✅ CallModal тоже!
+import styles from './page.module.css';
+import Image from 'next/image';
+import CallModal from "@/components/ui/CallModal";
+
 
 interface Program {
-  id: string;
+  id: string | number;
   name: string;
   image: string;
   description?: string;
@@ -16,107 +22,165 @@ export default function ProgramsPage() {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [modalImage, setModalImage] = useState({ open: false, url: '', alt: '' });
+  const [callModalOpen, setCallModalOpen] = useState(false);  // ✅ CallModal состояние
+  const [callReason, setCallReason] = useState('Общий запрос');
 
-  // Загрузка данных программ
+  // ✅ openCallModal ФУНКЦИЯ
+  const openCallModal = (reason: string = 'Общий запрос') => {
+    setCallReason(reason);
+    setCallModalOpen(true);
+  };
+
+  // ✅ ЗАГРУЗКА ДАННЫХ
   useEffect(() => {
-    fetch('/api/programs')
+    fetch('/api/db')
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
-      .then((data: Program[]) => {
-        console.log('✅ Программы загружены:', data);
-        setPrograms(data);
+      .then((data: any) => {
+        const safePrograms: Program[] = Array.isArray(data.programs)
+          ? data.programs.filter((p: any): p is Program => 
+              p && p.id && p.name && p.image
+            )
+          : [];
+        setPrograms(safePrograms);
         setLoading(false);
       })
       .catch(err => {
-        console.error('❌ Ошибка загрузки программ:', err);
-        setError('Ошибка загрузки данных');
+        console.error('❌ Ошибка:', err);
+        setError('Ошибка загрузки');
         setLoading(false);
       });
   }, []);
 
+  const openImageModal = (url: string, alt: string) => {
+    setModalImage({ open: true, url, alt });
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-400 to-orange-500">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-400 to-green-500">
         <div className="text-center text-white">
           <Loader2 className="w-16 h-16 animate-spin mx-auto mb-8" />
-          <p className="text-2xl">Загрузка программ...</p>
+          <p className="text-2xl font-bold">Загрузка...</p>
         </div>
       </div>
     );
   }
 
+  const safePrograms = Array.isArray(programs) ? programs : [];
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-      
-      {/* Заголовок */}
-      <section className="pt-24 pb-20 bg-gradient-to-br from-yellow-50 to-orange-50">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent drop-shadow-2xl mb-8">
-            🥋 Программы тренировок
-          </h1>
-       
-        </div>
-      </section>
+      {/* ✅ Header С OpenCallModal */}
+      <Header 
+        pageTitle="Все программы тренировок"
+        openCallModal={openCallModal}  // ✅ ПЕРЕДАЁМ!
+      />
 
-      {/* Плитки программ */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          {error || programs.length === 0 ? (
-            <div className="text-center py-32">
-              <ImageIcon className="w-32 h-32 text-gray-300 mx-auto mb-8" />
-              <h2 className="text-4xl md:text-5xl font-black text-gray-400 mb-6">
-                Данные не заполнены
-              </h2>
-              <p className="text-xl text-gray-500 max-w-2xl mx-auto">
-                Программы тренировок скоро появятся. Следите за обновлениями!
-              </p>
+      {/* ✅ Заголовок */}
+      
+      <SectionSpacer height="lg" background="default" />
+
+      {/* ✅ ПЛИТКИ - ТОЧНАЯ КОпиЯ HomePrograms */}
+      <section className={styles.programsSection}>
+        <div className="max-w-6xl mx-auto px-4">
+          {error || safePrograms.length === 0 ? (
+            <div className="text-center py-20">
+              <div className="inline-block p-12 bg-gray-100 rounded-br-[1%] shadow-2xl">
+                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full flex items-center justify-center">
+                  <span className="text-3xl font-bold text-white">🏋️</span>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-700 mb-4">Программы скоро появятся</h3>
+                <p className="text-xl text-gray-500 max-w-md mx-auto">Следите за обновлениями!</p>
+              </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {programs.map((program) => (
-                <Link 
-                  key={program.id} 
-                  href={`/programs/${program.id}`}
-                  className="group relative bg-gradient-to-br from-gray-50 to-gray-100 p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-6 hover:scale-105 border border-gray-100 hover:border-yellow-200 overflow-hidden h-[420px] flex flex-col"
-                >
-                  {/* Фото программы */}
-                  <div className="relative flex-shrink-0 mb-6 h-64 rounded-2xl bg-cover bg-center shadow-2xl group-hover:scale-110 transition-transform duration-500 overflow-hidden">
+            <>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                {safePrograms.map((program) => (
+                  <div 
+                    key={program.id} 
+                    className="group cursor-pointer hover:scale-[1.02] transition-all duration-300"
+                  >
+                    {/* ✅ КАРТИНКА - КЛИК = МОДАЛКА */}
                     <div 
-                      style={{ backgroundImage: `url(${program.image})` }} 
-                      className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:bg-black/20 transition-all duration-500" />
+                      className="w-full h-80 bg-gray-100 rounded-br-[1%] overflow-hidden shadow-2xl group-hover:shadow-3xl transition-all duration-500 hover:-translate-y-2"
+                      onClick={() => openImageModal(program.image, program.name)}
+                    >
+                      <Image
+                        src={program.image}
+                        alt={program.name}
+                        width={400}
+                        height={320}
+                        className="w-full h-full object-contain hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+
+                    {/* ✅ КОНТЕНТ + КНОПКИ - ТОЧНАЯ КОпиЯ */}
+                    <div className="mt-6 text-center">
+                      <h3 className="text-2xl font-bold text-gray-900 mb-4">{program.name}</h3>
+                      <p className="text-gray-600 mb-6 leading-relaxed">{program.description}</p>
+                      
+                      {/* ✅ ДВЕ КНОПКИ - ТОЧНАЯ КОпиЯ HomePrograms */}
+                      <div className="flex gap-4 justify-center">
+                        <button 
+                          className="px-8 py-3 bg-emerald-600 text-white font-semibold rounded-md hover:bg-emerald-700 transition-all shadow-md hover:shadow-lg whitespace-nowrap"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openCallModal(`Программа: ${program.name}`);  // ✅ РАБОТАЕТ!
+                          }}
+                        >
+                          Записаться
+                        </button>
+                        
+                        <Link 
+                          href={`/programs/${program.id}`}
+                          className="px-8 py-3 bg-white text-emerald-600 font-semibold rounded-md border-2 border-emerald-600 hover:bg-emerald-600 hover:text-white transition-all shadow-md hover:shadow-lg whitespace-nowrap"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Подробнее →
+                        </Link>
+                      </div>
+                    </div>
                   </div>
-                  
-                  {/* Название */}
-                  <div className="flex-1 flex flex-col justify-end">
-                    <h3 className="text-2xl md:text-3xl font-black text-center mb-4 bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent group-hover:scale-105 transition-all">
-                      {program.name}
-                    </h3>
-                    {program.description && (
-                      <p className="text-lg text-gray-600 text-center leading-relaxed line-clamp-3">
-                        {program.description}
-                      </p>
-                    )}
-                  </div>
-                  
-                  {/* Overlay при ховере */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8">
-                    <span className="text-white text-xl font-bold bg-yellow-400/90 px-6 py-3 rounded-2xl shadow-2xl">
-                      Подробнее →
-                    </span>
-                  </div>
+                ))}
+              </div>
+
+              {/* ✅ КНОПКА "ВСЕ ПРОГРАММЫ" - ТОЧНАЯ КОпиЯ */}
+              <div className="text-center">
+                <Link 
+                  href="/"
+                  className="inline-flex items-center gap-3 px-12 py-6 bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-600 text-white font-black rounded-3xl shadow-2xl hover:shadow-3xl hover:-translate-y-3 transition-all duration-500 text-xl backdrop-blur-xl border border-emerald-400/30 hover:from-emerald-700 hover:to-green-700 group"
+                >
+                  <span>🏠 На главную</span>
+                  <svg className="w-6 h-6 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
                 </Link>
-              ))}
-            </div>
+              </div>
+            </>
           )}
         </div>
       </section>
 
       <Footer />
+
+      {/* ✅ МОДАЛКИ */}
+      <FullScreenImageModal 
+        isOpen={modalImage.open}
+        imageUrl={modalImage.url}
+        alt={modalImage.alt}
+        onClose={() => setModalImage({ open: false, url: '', alt: '' })}
+      />
+      
+      <CallModal 
+        isOpen={callModalOpen}
+        onClose={() => setCallModalOpen(false)}
+        reason={callReason}
+      />
     </div>
   );
 }

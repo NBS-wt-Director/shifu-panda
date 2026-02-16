@@ -96,14 +96,13 @@ export default function ProgramPage({ params }: { params: Promise<{ id: string }
   return (
     // ... остальной JSX код БЕЗ ИЗМЕНЕНИЙ
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <Header
+         pageTitle={program.name}
+      />
       
       <section className="pt-24 pb-20 bg-gradient-to-br from-yellow-50 to-orange-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
-            <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent drop-shadow-2xl mb-8">
-              {program.name}
-            </h1>
             <div className="max-w-4xl mx-auto">
               <p className="text-xl md:text-2xl text-gray-700 leading-relaxed mb-12">{program.description}</p>
             </div>

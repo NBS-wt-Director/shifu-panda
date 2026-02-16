@@ -63,28 +63,19 @@ export default function TrainersPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <Header 
+       pageTitle='Наша команда'
+      />
       
-      {/* Заголовок */}
-      <section className="pt-24 pb-20 bg-gradient-to-br from-yellow-50 to-orange-50">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent drop-shadow-2xl mb-8">
-            👨‍🏫 Наша команда
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-            Познакомьтесь с нашими профессионалами и их помощниками
-          </p>
-        </div>
-      </section>
+      
 
       {/* Команда тренеров */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-black mb-6 bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent drop-shadow-2xl">
-              <Users className="inline-block w-12 h-12 mb-4" />
-              Команда тренеров
-            </h2>
+            <h3 className="text-4xl md:text-5xl font-black text-gray-400 mb-6">
+                Тренера
+              </h3>
           </div>
 
           {trainers.length === 0 ? (
@@ -94,7 +85,7 @@ export default function TrainersPage() {
                 Данные не заполнены
               </h3>
               <p className="text-xl text-gray-500 max-w-2xl mx-auto">
-                Тренеры скоро появятся в админке!
+                Тренера скоро появятся в админке!
               </p>
             </div>
           ) : (
@@ -140,32 +131,20 @@ export default function TrainersPage() {
         </div>
       </section>
 
-      {/* Разделитель */}
-      <div className="py-20 bg-gradient-to-r from-yellow-400 to-orange-500">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl">
-            <div className="w-12 h-12 bg-gradient-to-r from-gray-900 to-black rounded-full flex items-center justify-center shadow-lg">
-              ✨
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Помощники */}
       <section className="py-24 bg-gradient-to-br from-gray-50 to-gray-100">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-black mb-6 bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent drop-shadow-2xl">
-              <UserCog className="inline-block w-12 h-12 mb-4" />
-              Их любимые помощники
-            </h2>
+          <h3 className="text-4xl md:text-5xl font-black text-gray-400 mb-6">
+                персоонал
+              </h3>
           </div>
 
           {staff.length === 0 ? (
             <div className="text-center py-32">
               <UserCog className="w-32 h-32 text-gray-300 mx-auto mb-8" />
               <h3 className="text-4xl md:text-5xl font-black text-gray-400 mb-6">
-                Помощники пока скрыты
+                тут пусто
               </h3>
               <p className="text-xl text-gray-500 max-w-2xl mx-auto">
                 Работаем над этим! Скоро добавим администраторов, менеджеров и других помощников тренеров.
