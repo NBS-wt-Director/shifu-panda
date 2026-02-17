@@ -170,7 +170,7 @@ const defaultSections = [
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="цфр2026"
+              placeholder="******************"
               autoFocus
             />
             <button type="submit">Войти</button>

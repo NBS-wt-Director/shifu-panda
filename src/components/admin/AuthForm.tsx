@@ -18,7 +18,7 @@ export default function AuthForm({ password, setPassword, onSubmit, error }: Aut
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="цфр2026"
+            placeholder="вспоминай..."
             className={styles.authInput}
             autoFocus
           />
