@@ -130,14 +130,7 @@ export default function HomeHeader({ displayData, logo, openCallModal }: HomeHea
         </ul>
       </nav>
 
-      {/* ✅ КНОПКА ЗВОНКА */}
-      <button 
-        className={styles.callButton}
-        onClick={() => openCallModal('Общий запрос')}
-      >
-        <Phone size={24} />
-        Заказать звонок
-      </button>
+
 
       {/* ✅ МОБИЛЬНОЕ МЕНЮ */}
       <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.mobileOpen : ''}`} ref={mobileRef}>
