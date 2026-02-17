@@ -141,26 +141,26 @@ export default function HomeHeader({ displayData, logo, openCallModal }: HomeHea
           <li><a href="#trainers" className={styles.mobileNavLink}>Тренеры</a></li>
           <li><a href="#news" className={styles.mobileNavLink}>Новости</a></li>
           <li><a href="#contacts" className={styles.mobileNavLink}>Контакты</a></li>
-          <li className={styles.mobileDropdown}>
-            <span className={styles.mobileDropdownToggle}>Программы</span>
-            <div className={styles.mobileDropdownMenu}>
-              <a href="#programs" className={styles.mobileDropdownLink}>Все программы</a>
-              {programsForMenu.map((program: any) => (
-                <a key={program.id} href="#programs" className={styles.mobileDropdownLink}>
-                  {program.name}
-                </a>
+          <li><a href="/trainers" className={styles.mobileNavLink}>Коллектив</a></li>
+           <li><a href="/programs" className={styles.mobileNavLink}>Все программы</a></li> 
+           <span className={styles.mobileDropdownToggle}>Наши программы:</span>
+           {programsForMenu.map((program: any) => (
+                <li><a key={program.id} href={`/programs/${program.id}`} className={styles.mobileNavLink}>
+                {program.name}
+              </a></li>
               ))}
-            </div>
-          </li>
+              <span className={styles.mobileDropdownToggle}>Наши тренеры:</span>
+              {trainersForMenu.map((trainer: any) => (
+                <li><a key={trainer.id} href={`/trainers/${trainer.id}`} className={styles.mobileNavLink}>
+                  {trainer.name}
+                </a></li>
+              ))}
+
           <li className={styles.mobileDropdown}>
-            <span className={styles.mobileDropdownToggle}>Коллектив</span>
+            
             <div className={styles.mobileDropdownMenu}>
               <a href="#trainers" className={styles.mobileDropdownLink}>Наш коллектив</a>
-              {trainersForMenu.map((trainer: any) => (
-                <a key={trainer.id} href="#trainers" className={styles.mobileDropdownLink}>
-                  {trainer.name}
-                </a>
-              ))}
+             
             </div>
           </li>
         </ul>
