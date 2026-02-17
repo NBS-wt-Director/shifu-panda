@@ -55,6 +55,16 @@ export default function HomeContacts({ contacts }: { contacts: Contacts }) {
           <HomeSocialButtons social={contacts.social} />
         </div>
       </div>
+    <div className="border-t border-white/10 pt-12 mt-16">
+          <div className="flex flex-col lg:flex-row justify-between items-center gap-6 text-center lg:text-left">
+            <p className="text-gray-400 text-lg font-medium">
+              © 2026 <span className="font-black text-white">Шифу Панда</span>.Екатеринбург. Все права защищены. 
+            </p>
+            <div className="flex gap-4 text-gray-400 text-sm">
+            </div>
+          </div>
+        </div>
+      
     </section>
   );
 }

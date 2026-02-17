@@ -57,7 +57,7 @@ export default function HomeHeader({ displayData, logo, openCallModal }: HomeHea
   return (
     <header className={styles.header}>
       {/* ✅ ЛОГОТИП С АНИМАЦИЕЙ */}
-      <Link href="/" className={styles.logoLink}>
+      <div onClick={() => openCallModal('Общий запрос')} className={styles.logoLink}>
        
           <Image 
             src='/logo.png'
@@ -67,7 +67,7 @@ export default function HomeHeader({ displayData, logo, openCallModal }: HomeHea
             height={48}
             priority
           />
-             </Link>
+             </div>
 
       {/* ✅ МОБИЛЬНАЯ КНОПКА */}
       <button 
@@ -130,7 +130,7 @@ export default function HomeHeader({ displayData, logo, openCallModal }: HomeHea
         </ul>
       </nav>
 
-
+     
 
       {/* ✅ МОБИЛЬНОЕ МЕНЮ */}
       <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.mobileOpen : ''}`} ref={mobileRef}>
@@ -164,15 +164,7 @@ export default function HomeHeader({ displayData, logo, openCallModal }: HomeHea
             </div>
           </li>
         </ul>
-        <button 
-          className={styles.mobileCallButton}
-          onClick={() => {
-            openCallModal('Общий запрос');
-            setMobileMenuOpen(false);
-          }}
-        >
-          📞 Заказать звонок
-        </button>
+
       </div>
 
       {/* ✅ ОВЕРЛЕЙ */}
