@@ -170,47 +170,28 @@ export default function Header({
           </div>
         </div>
 
-        {/* ✅ МОБИЛЬНОЕ МЕНЮ */}
-        <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.mobileOpen : ''}`} ref={mobileRef}>
-          <ul className={styles.mobileNavList}>
-            <li><a href="/" className={styles.mobileNavLink}>🏠 Главная</a></li>
-            <li><a href="/schedule" className={styles.mobileNavLink}>📅 Расписание</a></li>
-            <li><a href="/prices" className={styles.mobileNavLink}>💰 Цены</a></li>
-            <li className={styles.mobileDropdown}>
-              <span className={styles.mobileDropdownToggle}>🥋 Программы</span>
-              <div className={styles.mobileDropdownMenu}>
-                <a href="/programs" className={styles.mobileDropdownLink}>Все программы</a>
-                {programsForMenu.map((program) => (
-                  <a key={program.id} href={`/programs/${program.id}`} className={styles.mobileDropdownLink}>
-                    {program.name}
-                  </a>
-                ))}
-              </div>
-            </li>
-            <li className={styles.mobileDropdown}>
-              <span className={styles.mobileDropdownToggle}>👥 Коллектив</span>
-              <div className={styles.mobileDropdownMenu}>
-                <a href="/trainers" className={styles.mobileDropdownLink}>Наш коллектив</a>
-                {trainersForMenu.map((trainer) => (
-                  <a key={trainer.id} href={`/trainers/${trainer.id}`} className={styles.mobileDropdownLink}>
-                    {trainer.name}
-                  </a>
-                ))}
-              </div>
-            </li>
-            <li><a href="/news" className={styles.mobileNavLink}>📰 Новости</a></li>
-            <li><a href="/contacts" className={styles.mobileNavLink}>📞 Контакты</a></li>
-          </ul>
-          <button 
-            className={styles.mobileCallButton}
-            onClick={() => {
-              openCallModal('Общий запрос');
-              setMobileMenuOpen(false);
-            }}
-          >
-            📞 Заказать звонок
-          </button>
-        </div>
+{/* ✅ МОБИЛЬНОЕ МЕНЮ */}
+<div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.mobileOpen : ''}`} ref={mobileRef}>
+        <ul className={styles.mobileNavList}>
+          <li><a href="/" className={styles.mobileNavLink}>Главная</a></li>
+          <li><a href="/trainers" className={styles.mobileNavLink}>Коллектив</a></li>
+           <li><a href="/programs" className={styles.mobileNavLink}>Все программы</a></li> 
+           <span className={styles.mobileDropdownToggle}>Наши программы:</span>
+           {programsForMenu.map((program: any) => (
+                <li><a key={program.id} href={`/programs/${program.id}`} className={styles.mobileNavLink}>
+                {program.name}
+              </a></li>
+              ))}
+              <span className={styles.mobileDropdownToggle}>Наши тренеры:</span>
+              {trainersForMenu.map((trainer: any) => (
+                <li><a key={trainer.id} href={`/trainers/${trainer.id}`} className={styles.mobileNavLink}>
+                  {trainer.name}
+                </a></li>
+              ))}
+
+                  </ul>
+
+      </div>
 
         {mobileMenuOpen && <div className={styles.mobileOverlay} onClick={() => setMobileMenuOpen(false)} />}
       </header>

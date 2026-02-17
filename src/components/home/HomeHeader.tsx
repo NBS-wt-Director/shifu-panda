@@ -156,14 +156,7 @@ export default function HomeHeader({ displayData, logo, openCallModal }: HomeHea
                 </a></li>
               ))}
 
-          <li className={styles.mobileDropdown}>
-            
-            <div className={styles.mobileDropdownMenu}>
-              <a href="#trainers" className={styles.mobileDropdownLink}>Наш коллектив</a>
-             
-            </div>
-          </li>
-        </ul>
+                  </ul>
 
       </div>
 
