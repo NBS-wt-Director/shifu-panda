@@ -1,14 +1,14 @@
 # 🎯 Полный анализ проекта
 
-**Дата:** 17.02.2026, 02:05:33
+**Дата:** 17.02.2026, 06:24:01
 
 **Статистика:**
 | Тип | Количество |
 |----|------------|
-| 📁 Все файлы | **202** |
-| 📄 Текстовые | **122** |
+| 📁 Все файлы | **206** |
+| 📄 Текстовые | **125** |
 | 🖼️ Медиа | **30** |
-| 📏 Строк кода | **12 721** |
+| 📏 Строк кода | **13 141** |
 | 🎨 UI компонентов | **50** |
 | 🚨 Одиноких UI | **10** |
 
@@ -34,6 +34,7 @@ package-lock.json (289.1KB)
     📄 package-lock.json
     📄 package.json
     📄 postcss.config.mjs
+    📄 project-analysis.md
     📄 public
     📄 scripts
     📄 src
@@ -46,6 +47,7 @@ package-lock.json (289.1KB)
     📄 ssl-nginx.conf
     📄 ssl-selfsigned.sh
   public/
+    📄 favicon.ico
     🖼️ logo.png
     📄 uploads
     🖼️ расписание1.jpg
@@ -148,6 +150,7 @@ package-lock.json (289.1KB)
           📄 route.ts
       programs/
         📄 [id]
+        📄 page.module.css
         📄 page.tsx
         [id]/
           📄 page.tsx
@@ -159,6 +162,7 @@ package-lock.json (289.1KB)
     components/
       📄 Accordion.module.css css
       📄 Footer.tsx
+      📄 Header.module.css
       📄 Header.tsx
       📄 Metadata.tsx
       📄 admin
@@ -273,13 +277,13 @@ package-lock.json (289.1KB)
 |----|------|-------|----|
 | 1 | `src/components/admin/AdminStaffPrograms.tsx` | 565 | 20.8 |
 | 2 | `src/components/admin/AdminPrograms.module.css` | 475 | 9.5 |
-| 3 | `src/components/Header.tsx` | 415 | 20.4 |
-| 4 | `src/components/admin/AdminSchedulePrices.tsx` | 395 | 12.8 |
-| 5 | `src/components/admin/AdminPrograms.tsx` | 369 | 12.4 |
-| 6 | `src/components/admin/AdminStaffPrograms.module.css` | 368 | 7.1 |
-| 7 | `src/components/admin/AdminSchedulePrices.module.css` | 336 | 7.7 |
-| 8 | `src/components/admin/AdminNews.module.css` | 334 | 6.5 |
-| 9 | `src/components/admin/AdminSettings.tsx` | 325 | 10.9 |
+| 3 | `src/components/admin/AdminSchedulePrices.tsx` | 395 | 12.8 |
+| 4 | `src/components/admin/AdminPrograms.tsx` | 369 | 12.4 |
+| 5 | `src/components/admin/AdminStaffPrograms.module.css` | 368 | 7.1 |
+| 6 | `src/components/admin/AdminSchedulePrices.module.css` | 336 | 7.7 |
+| 7 | `src/components/admin/AdminNews.module.css` | 334 | 6.5 |
+| 8 | `src/components/admin/AdminSettings.tsx` | 325 | 10.9 |
+| 9 | `src/app/trainers/[id]/page.tsx` | 308 | 13.3 |
 | 10 | `src/app/admin/page.tsx` | 301 | 9.4 |
 
 ## 🚨 Одинокие UI компоненты (10)

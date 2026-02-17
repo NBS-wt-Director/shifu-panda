@@ -125,8 +125,8 @@ export default function CallModal({ isOpen, onClose, reason }: CallModalProps) {
               <textarea 
                 placeholder="Комментарий (необязательно)"
                 rows={4}
-                value={formData.comment}
-                onChange={(e) => setFormData({...formData, comment: e.target.value})}
+                value={formData.message}
+                onChange={(e) => setFormData({...formData, message: e.target.value})}
                 className={`${styles.textarea} ${styles.input}`}
                 disabled={loading}
               />
