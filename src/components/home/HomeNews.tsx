@@ -25,7 +25,7 @@ export default function HomeNews({
     <section id="news" className={styles.news}>
       <div className="max-w-6xl mx-auto px-4">
         <h2 className="text-5xl md:text-6xl font-black text-center mb-20 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent drop-shadow-2xl">
-          Новости клуба
+         Наши события. 
         </h2>
         
         {safeNews.length > 0 ? (
