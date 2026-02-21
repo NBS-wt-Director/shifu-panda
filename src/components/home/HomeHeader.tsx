@@ -87,7 +87,7 @@ export default function HomeHeader({ displayData, logo, openCallModal }: HomeHea
           <li><a href="#trainers" className={styles.navLink}>Тренеры</a></li>
           <li><a href="#news" className={styles.navLink}>Новости</a></li>
           <li><a href="#contacts" className={styles.navLink}>Контакты</a></li>
-
+          <li><Link href="/lk" className={styles.navLink}>Личный кабинет</Link></li>
           {/* ✅ ПОДМЕНЮ ПРОГРАММЫ */}
           <li className={styles.dropdown}>
             <span 
@@ -141,6 +141,7 @@ export default function HomeHeader({ displayData, logo, openCallModal }: HomeHea
           <li><a href="#trainers" className={styles.mobileNavLink}>Тренеры</a></li>
           <li><a href="#news" className={styles.mobileNavLink}>Новости</a></li>
           <li><a href="#contacts" className={styles.mobileNavLink}>Контакты</a></li>
+          <li><a href="/lk" className={styles.mobileNavLink}>Личный кабинет</a></li>
           <li><a href="/trainers" className={styles.mobileNavLink}>Коллектив</a></li>
            <li><a href="/programs" className={styles.mobileNavLink}>Все программы</a></li> 
            <span className={styles.mobileDropdownToggle}>Наши программы:</span>

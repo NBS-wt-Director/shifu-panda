@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     await transporter.sendMail({
       from: `"${config.fromName}" <${config.smtpUser}>`,
-      to: config.adminEmail,
+      to: config.smtpUser,
       subject: `🐼 Заявка: ${name} (${reason})`,
       text: `Имя: ${name}\nТелефон: ${phone}\nEmail: ${email}\nЖелание: ${reason}\nСообщение: ${message}`,
       html: `

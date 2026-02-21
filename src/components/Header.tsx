@@ -129,6 +129,7 @@ export default function Header({
           <nav className={styles.desktopNav} ref={dropdownRef}>
             <ul className={styles.navList}>
               <li><Link href="/" className={styles.navLink}>Главная</Link></li>
+              <li><Link href="/lk" className={styles.navLink}>Личный кабинет </Link></li>
               <li className={styles.dropdown}>
                 <span className={styles.dropdownToggle} onClick={() => setIsProgramsOpen(!isProgramsOpen)}>
                   Программы ▼
@@ -176,6 +177,7 @@ export default function Header({
           <li><a href="/" className={styles.mobileNavLink}>Главная</a></li>
           <li><a href="/trainers" className={styles.mobileNavLink}>Коллектив</a></li>
            <li><a href="/programs" className={styles.mobileNavLink}>Все программы</a></li> 
+           <li><a href="/lk" className={styles.mobileNavLink}>Личный кабинет</a></li>
            <span className={styles.mobileDropdownToggle}>Наши программы:</span>
            {programsForMenu.map((program: any) => (
                 <li><a key={program.id} href={`/programs/${program.id}`} className={styles.mobileNavLink}>
