@@ -7,6 +7,7 @@ import FileInput from '@/components/ui/FileInput';
 interface SiteSettings {
   logo: string;
   favicon: string;
+  clientNotification?: string;
 }
 
 interface EmailConfig {
@@ -40,7 +41,7 @@ export default function AdminSettings({
   },
   onSave 
 }: AdminSettingsProps) {
-  
+  const [clientNotification, setClientNotification] = useState(initialSiteSettings.clientNotification || '');
   const [siteSettings, setSiteSettings] = useState<SiteSettings>(initialSiteSettings);
   const [emailConfig, setEmailConfig] = useState<EmailConfig>(initialEmailConfig);
   const [logoPreview, setLogoPreview] = useState('');
@@ -56,7 +57,7 @@ export default function AdminSettings({
     setSiteSettings(initialSiteSettings);
     setLogoPreview(initialSiteSettings.logo);
     setFaviconPreview(initialSiteSettings.favicon);
-    
+    setClientNotification(initialSiteSettings.clientNotification || ''); // ✅
     setEmailConfig(initialEmailConfig);
     setErrorEmails(initialEmailConfig.errorEmail || []);
   }, [initialSiteSettings, initialEmailConfig]);
@@ -104,8 +105,8 @@ export default function AdminSettings({
   };
 
   const saveChanges = () => {
-    onSave(siteSettings, emailConfig);
-    setHasChanges(false);
+     onSave({...siteSettings, clientNotification}, emailConfig); // ✅
+  setHasChanges(false);
   };
 
   const sendTestEmail = async () => {
@@ -126,6 +127,7 @@ export default function AdminSettings({
 
       <div className={styles.content}>
         <div className={styles.grid}>
+          
           {/* ✅ БЛОК ЛОГО/ФАВИКОН */}
           <div className={styles.settingsCard}>
             <h4>🌐 Внешний вид сайта</h4>
@@ -308,7 +310,27 @@ export default function AdminSettings({
             </div>
           </div>
         </div>
-
+         
+<div className={styles.settingsCard}>
+  <h4>📢 Уведомление клиентов</h4>
+  <div className={styles.field}>
+    <label>Текст уведомления (показывается в Header)</label>
+    <textarea
+      value={clientNotification}
+      onChange={(e) => {
+        setClientNotification(e.target.value);
+        setSiteSettings({...siteSettings, clientNotification: e.target.value});
+        setHasChanges(true);
+      }}
+      className={styles.textarea}
+      rows={4}
+      placeholder="Важное объявление для всех клиентов..."
+    />
+    <small className={styles.helperText}>
+      Пустое поле или только пробелы/табуляция = не показывать
+    </small>
+  </div>
+</div>
         <div className={styles.saveSection}>
           <button 
             className={`${styles.saveBtn} ${hasChanges ? styles.saveBtnActive : ''}`}

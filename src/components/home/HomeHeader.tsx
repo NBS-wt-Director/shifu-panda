@@ -9,15 +9,19 @@ interface HomeHeaderProps {
   displayData: any;
   logo?: string;
   openCallModal: (reason: string) => void;
+   clientNotification?: string; 
 }
 
-export default function HomeHeader({ displayData, logo, openCallModal }: HomeHeaderProps) {
+export default function HomeHeader({ displayData, logo, openCallModal = () => {},
+  clientNotification = ''  }: HomeHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isProgramsOpen, setIsProgramsOpen] = useState(false);
   const [isTrainersOpen, setIsTrainersOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const mobileRef = useRef<HTMLDivElement>(null);
-
+ const shouldShowNotification = clientNotification?.trim() && 
+    clientNotification.trim().length > 0 &&
+    clientNotification !== '\t';
   const trainersForMenu = displayData.trainers?.map((t: any) => ({
     id: t.id,
     name: t.name
@@ -55,7 +59,19 @@ export default function HomeHeader({ displayData, logo, openCallModal }: HomeHea
   }, [mobileMenuOpen]);
 
   return (
+    
     <header className={styles.header}>
+      {/* ✅ УВЕДОМЛЕНИЕ - ВЕРХНЕЕ ПОЛОЖЕНИЕ */}
+      {shouldShowNotification && (
+        <div className={styles.notificationBanner}>
+          <div className={styles.notificationContent}>
+            <span className={styles.notificationIcon}>🔔</span>
+            <span className={styles.notificationText}>{clientNotification}</span>
+            <button className={styles.notificationClose}>×</button>
+          </div>
+        </div>
+      )}
+
       {/* ✅ ЛОГОТИП С АНИМАЦИЕЙ */}
       <div onClick={() => openCallModal('Общий запрос')} className={styles.logoLink}>
        

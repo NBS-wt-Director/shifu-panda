@@ -10,6 +10,7 @@ interface HeaderProps {
   pageTitle?: string;
   logo?: string;
   openCallModal?: (reason: string) => void;
+   clientNotification?: string; 
 }
 
 interface MenuItem {
@@ -20,9 +21,12 @@ interface MenuItem {
 export default function Header({ 
   pageTitle = 'Фитнес-клуб',
   logo = '/logo.png',
-  openCallModal = () => {}
+openCallModal = () => {},
+  clientNotification = '' // ✅
 }: HeaderProps) {
-  
+   const shouldShowNotification = clientNotification?.trim() && 
+    clientNotification.trim().length > 0 &&
+    clientNotification !== '\t';
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isProgramsOpen, setIsProgramsOpen] = useState(false);
   const [isTrainersOpen, setIsTrainersOpen] = useState(false);
@@ -97,6 +101,17 @@ export default function Header({
 
   return (
     <>
+    {/* ✅ УВЕДОМЛЕНИЕ - ВЕРХНЕЕ ПОЛОЖЕНИЕ */}
+      {shouldShowNotification && (
+        <div className={styles.notificationBanner}>
+          <div className={styles.notificationContent}>
+            <span className={styles.notificationIcon}>🔔</span>
+            <span className={styles.notificationText}>{clientNotification}</span>
+            <button className={styles.notificationClose}>×</button>
+          </div>
+        </div>
+      )}
+
       <Head>
         <title>{pageTitle} | Центр Функционального Развития Шифу Панда</title>
       </Head>

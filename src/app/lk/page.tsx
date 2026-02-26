@@ -10,7 +10,7 @@ export default function LkPage() {
   const [callModalOpen, setCallModalOpen] = useState(false);
   const [callReason, setCallReason] = useState('Личный кабинет');
   const [scriptsLoaded, setScriptsLoaded] = useState(false);
-
+  const [siteSettings, setSiteSettings] = useState({ clientNotification: '' });
   const openCallModal = (reason: string = 'Личный кабинет') => {
     setCallReason(reason);
     setCallModalOpen(true);
@@ -18,6 +18,7 @@ export default function LkPage() {
 
   useEffect(() => {
     loadLkLibraries();
+    
   }, []);
 
   const loadLkLibraries = () => {

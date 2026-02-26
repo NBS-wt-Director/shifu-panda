@@ -24,7 +24,7 @@ export default function TrainersPage() {
   const [staff, setStaff] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
+const [siteSettings, setSiteSettings] = useState({ clientNotification: '' });
   // Загрузка данных тренеров и сотрудников
   useEffect(() => {
     Promise.all([

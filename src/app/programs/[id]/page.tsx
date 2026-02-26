@@ -32,6 +32,7 @@ export default function ProgramPage({ params }: { params: Promise<{ id: string }
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ name: '', phone: '', email: '', message: '' });
   const [formReason, setFormReason] = useState('');
+  const [siteSettings, setSiteSettings] = useState({ clientNotification: '' });
 
   // ✅ ИСПРАВЛЕНО: await params
   useEffect(() => {
@@ -45,6 +46,7 @@ export default function ProgramPage({ params }: { params: Promise<{ id: string }
         .then((data: Program) => {
           setProgram(data);
           setFormReason(`записаться на программу "${data.name}"`);
+          
           setLoading(false);
         })
         .catch(err => {

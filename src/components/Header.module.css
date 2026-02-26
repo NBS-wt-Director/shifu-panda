@@ -161,3 +161,74 @@
 @media (max-width: 640px) { 
   .topRow, .bottomRow { padding-left: 0.75rem; padding-right: 0.75rem; } 
 }
+
+.notificationBanner {
+  background: linear-gradient(90deg, #ff6b6b, #feca57);
+  color: white;
+  padding: 12px 0;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+  position: relative;
+  z-index: 100;
+  animation: slideDown 0.5s ease-out;
+}
+
+.notificationContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.notificationIcon {
+  font-size: 18px;
+}
+
+.notificationText {
+  flex: 1;
+  text-align: center;
+}
+
+.notificationClose {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.notificationClose:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .notificationContent {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+    padding: 0 16px;
+  }
+  
+  .notificationText {
+    font-size: 14px;
+  }
+}

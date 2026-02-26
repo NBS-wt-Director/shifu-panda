@@ -19,6 +19,7 @@ interface Program {
 }
 
 export default function ProgramsPage() {
+  const [siteSettings, setSiteSettings] = useState({ clientNotification: '' });
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -46,6 +47,7 @@ export default function ProgramsPage() {
             )
           : [];
         setPrograms(safePrograms);
+         setSiteSettings(data.settings || {});
         setLoading(false);
       })
       .catch(err => {

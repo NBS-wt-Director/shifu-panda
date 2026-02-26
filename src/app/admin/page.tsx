@@ -12,6 +12,7 @@ import AdminPrograms from '@/components/admin/AdminPrograms';
 import AdminStaffPrograms from '@/components/admin/AdminStaffPrograms'; 
 import AdminSettings from '@/components/admin/AdminSettings';
 import AdminNews from '@/components/admin/AdminNews';
+import AutoUpload from '@/components/admin/AutoUpload';
 import styles from './page.module.css';
 
 export default function AdminPage() {
@@ -33,6 +34,7 @@ export default function AdminPage() {
    sections: { component: 'sections' },
     contacts: { component: 'contacts' },
     settings: { component: 'settings' },
+    autoupload: {  component: 'autoupload',},
   };
 
 
@@ -281,7 +283,22 @@ const defaultSections = [
       updateChangesCount(newData);
     }}
   />
-) :currentConfig.component === 'sections' ? (
+) // В рендере mainGrid добавьте:
+:currentConfig.component === 'autoupload' ? (
+  <AutoUpload 
+    autouploadData={dbData?.autoupload || { 
+      status: 'idle' as const, 
+      log: [], 
+      progress: 0 
+    }}
+    onSave={(newData) => {
+      const updatedData = { ...dbData, autoupload: newData };
+      setDbData(updatedData);
+      updateChangesCount(updatedData);
+    }}
+  />
+)
+:currentConfig.component === 'sections' ? (
     <AdminSections 
       sections={dbData.sections || defaultSections}
       onSave={(newSections) => {

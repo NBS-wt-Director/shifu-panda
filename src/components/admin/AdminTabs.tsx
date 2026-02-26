@@ -16,6 +16,7 @@ export default function AdminTabs({ activeTab, onTabChange }: AdminTabsProps) {
     { id: 'contacts', label: '📞 Контакты', countKey: 'contacts' },
     { id: 'sections', label: '🏗️ Разделы', countKey: 'sections' }, 
     { id: 'settings', label: '⚙️ Настройки', countKey: 'settings' },
+    {id: 'autoupload',label: 'Автозагрузка',countKey: 'autoupload'}
   ];
 
   return (
