@@ -2,8 +2,6 @@
 import { useState, useEffect } from 'react';
 import AdminHeader from '@/components/admin/AdminHeader';
 import AdminTabs from '@/components/admin/AdminTabs';
-import AdminItemForm from '@/components/admin/AdminItemForm';
-import AdminItemList from '@/components/admin/AdminItemList';
 import AdminSections from '@/components/admin/AdminSections';
 import AdminContacts from '@/components/admin/AdminContacts';
 import AdminSlider from '@/components/admin/AdminSlider';
