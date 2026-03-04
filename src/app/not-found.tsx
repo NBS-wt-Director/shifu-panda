@@ -10,7 +10,17 @@ export default function NotFound() {
   const [loading, setLoading] = useState(false);
   const [errorInfo, setErrorInfo] = useState('');
   const [countdown, setCountdown] = useState(15);
+  const [isClient, setIsClient] = useState(false);
+  const [language, setLanguage] = useState('ru-RU');
   const router = useRouter();
+
+  // Определяем, что мы на клиенте
+  useEffect(() => {
+    setIsClient(true);
+    if (typeof navigator !== 'undefined') {
+      setLanguage(navigator.language);
+    }
+  }, []);
 
   // Обратный отсчёт и редирект
   useEffect(() => {
@@ -29,10 +39,14 @@ export default function NotFound() {
 
   useEffect(() => {
     // Автоматическая отправка отчета об ошибке
-    sendErrorReport();
-  }, []);
+    if (isClient) {
+      sendErrorReport();
+    }
+  }, [isClient]);
 
   const sendErrorReport = async () => {
+    if (typeof window === 'undefined') return;
+    
     setLoading(true);
     try {
       const errorData = {
@@ -61,7 +75,9 @@ export default function NotFound() {
   };
 
   const copyUrl = () => {
-    navigator.clipboard.writeText(window.location.href);
+    if (typeof window !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(window.location.href);
+    }
   };
 
   return (
@@ -96,7 +112,7 @@ export default function NotFound() {
               <div className="space-y-2 text-sm">
                 <p></p>
                 <p><span className="font-bold">Время:</span> {new Date().toLocaleString('ru-RU')}</p>
-                <p><span className="font-bold">Язык:</span> {navigator.language}</p>
+                <p><span className="font-bold">Язык:</span> {language}</p>
               </div>
             </div>
 
