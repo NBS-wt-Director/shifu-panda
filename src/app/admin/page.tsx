@@ -10,7 +10,11 @@ import AdminPrograms from '@/components/admin/AdminPrograms';
 import AdminStaffPrograms from '@/components/admin/AdminStaffPrograms'; 
 import AdminSettings from '@/components/admin/AdminSettings';
 import AdminNews from '@/components/admin/AdminNews';
+import AdminWorkouts from '@/components/admin/AdminWorkouts';
 import AutoUpload from '@/components/admin/AutoUpload';
+import AdminStorage from '@/components/admin/AdminStorageNew';
+import AdminStatsContainer from '@/components/admin/AdminStatsContainer';
+import AdminDividers from '@/components/admin/AdminDividers';
 import styles from './page.module.css';
 
 export default function AdminPage() {
@@ -27,12 +31,16 @@ export default function AdminPage() {
     programs: { component: 'programs' },
     sliders: { component: 'slider' }, 
     schedulePrices: { component: 'schedulePrices' },
+    workouts: { component: 'workouts' },
      staff: { component: 'staff' },
      news: { component: 'news' },
    sections: { component: 'sections' },
+    dividers: { component: 'dividers' },
     contacts: { component: 'contacts' },
     settings: { component: 'settings' },
+    stats: { component: 'stats' },
     autoupload: {  component: 'autoupload',},
+    files: { component: 'files' },
   };
 
 
@@ -263,6 +271,16 @@ const defaultSections = [
       updateChangesCount(newData);
     }}
   />
+) : currentConfig.component === 'workouts' ? (
+  <AdminWorkouts 
+    workouts={dbData.workouts || []}
+    programs={dbData.programs || []}
+    onSave={(newWorkouts) => {
+      const newData = { ...dbData, workouts: newWorkouts };
+      setDbData(newData);
+      updateChangesCount(newData);
+    }}
+  />
 ) :currentConfig.component === 'slider' ? (
   <AdminSlider 
     sliders={dbData.sliders || []}
@@ -284,13 +302,19 @@ const defaultSections = [
 ) // В рендере mainGrid добавьте:
 :currentConfig.component === 'autoupload' ? (
   <AutoUpload 
-    autouploadData={dbData?.autoupload || { 
+    autouploadData={dbData?.siteSettings?.autoupload || { 
       status: 'idle' as const, 
       log: [], 
       progress: 0 
     }}
     onSave={(newData) => {
-      const updatedData = { ...dbData, autoupload: newData };
+      const updatedData = { 
+        ...dbData, 
+        siteSettings: {
+          ...dbData.siteSettings,
+          autoupload: newData
+        }
+      };
       setDbData(updatedData);
       updateChangesCount(updatedData);
     }}
@@ -305,6 +329,20 @@ const defaultSections = [
         updateChangesCount(newData);
       }}
     />
+  ) : currentConfig.component === 'dividers' ? (
+    <AdminDividers 
+      dividers={dbData.globalDivider || { enabled: true, height: 'xxl', background: 'gradientBlue', textContent: '🏃 🏋️ 🧘 💪', fontSize: 'large' }}
+      sections={dbData.sections || defaultSections}
+      onSave={(newDivider) => {
+        const newData = { ...dbData, globalDivider: newDivider };
+        setDbData(newData);
+        updateChangesCount(newData);
+      }}
+    />
+  ) : currentConfig.component === 'stats' ? (
+    <AdminStatsContainer />
+  ) : currentConfig.component === 'files' ? (
+    <AdminStorage />
   ) : (
     <h1>Секция в разработке!</h1>
   )}

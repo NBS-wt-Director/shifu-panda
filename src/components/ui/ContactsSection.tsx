@@ -68,7 +68,7 @@ interface Contacts {
             {/* Карта */}
             <div className="relative h-[500px] rounded-3xl shadow-2xl overflow-hidden">
               <iframe
-                src="https://yandex.ru/map-widget/v1/?ll=60.633%2C56.85&z=15&lang=ru_RU&l=map&pt=60.633,56.85,pm2vvm~drLbmw~vtmPm0"
+                src="https://yandex.ru/maps/org/tsentr_funktsionalnogo_razvitiya/1226243121/?ll=60.604293%2C56.822001&z=16.88"
                 width="100%"
                 height="100%"
                 className="border-0"

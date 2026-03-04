@@ -10,6 +10,10 @@ interface AutoUploadData {
   oauthToken?: string;
   isTokenValid?: boolean;
   scanResult?: any;
+  yandexAccount?: {
+    login: string;
+    displayName: string;
+  };
 }
 
 interface AutoUploadProps {
@@ -20,10 +24,10 @@ interface AutoUploadProps {
 export default function AutoUpload({ autouploadData, onSave }: AutoUploadProps) {
   const [folderPath, setFolderPath] = useState('');
   const [oauthToken, setOauthToken] = useState('');
+  const [clientId, setClientId] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeScanType, setActiveScanType] = useState<'programs' | 'trainers' | 'sliders'>('programs');
-
-  console.log('🔄 RENDER AutoUpload:', { status: autouploadData?.status, hasToken: !!autouploadData?.oauthToken });
+  const [sessionLog, setSessionLog] = useState<string[]>([]);
 
   const safeData = autouploadData || { 
     status: 'idle' as const, 
@@ -32,263 +36,362 @@ export default function AutoUpload({ autouploadData, onSave }: AutoUploadProps) 
     folderPath: '',
     oauthToken: '',
     isTokenValid: false,
-    scanResult: null 
+    scanResult: null,
+    yandexAccount: undefined
   };
+
+  const isAuthenticated = safeData.isTokenValid && safeData.oauthToken;
 
   useEffect(() => {
-    console.log('📥 useEffect: загрузка данных из БД');
-    if (safeData.folderPath) {
-      setFolderPath(safeData.folderPath);
-      console.log('📁 Загружен folderPath:', safeData.folderPath);
+    if (safeData.folderPath) setFolderPath(safeData.folderPath);
+    if (safeData.oauthToken) setOauthToken(safeData.oauthToken);
+    
+    // Если есть токен но нет аккаунта - проверим токен
+    if (safeData.oauthToken && !safeData.yandexAccount) {
+      addSessionLog('🔄 Проверяю сохранённый токен...');
+      validateAndSaveToken(safeData.oauthToken);
     }
-    if (safeData.oauthToken) {
-      setOauthToken(safeData.oauthToken);
-      console.log('🔑 Загружен oauthToken');
-    }
-  }, [safeData.folderPath, safeData.oauthToken]);
+  }, [safeData.folderPath, safeData.oauthToken, safeData.yandexAccount]);
 
-  const addLog = (message: string) => {
-    console.log('📝 addLog:', message);
+  useEffect(() => {
+    const handleOAuthCallback = () => {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      
+      const token = params.get('access_token');
+      const error = params.get('error');
+      const errorDescription = params.get('error_description');
+
+      if (token) {
+        setSessionLog(prev => [...prev, `🔑 Получен токен, проверяю...`]);
+        window.history.replaceState(null, '', window.location.pathname);
+        validateAndSaveToken(token);
+      } else if (error) {
+        setSessionLog(prev => [...prev, `❌ Ошибка авторизации: ${errorDescription || error}`]);
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    };
+
+    handleOAuthCallback();
+    window.addEventListener('hashchange', handleOAuthCallback);
+    return () => window.removeEventListener('hashchange', handleOAuthCallback);
+  }, []);
+
+  const addSessionLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString('ru-RU');
-    const newLog = [...safeData.log, `${timestamp}: ${message}`].slice(-100);
-    const newData = { ...safeData, log: newLog };
-    onSave(newData);
+    setSessionLog(prev => [...prev.slice(-50), `${timestamp}: ${message}`]);
   };
 
-  const testToken = async () => {
-    console.log('🚀 === TEST TOKEN НАЧАЛО ===');
-    console.log('🔘 1. КНОПКА НАЖАТА! testToken вызвана');
+  const validateAndSaveToken = async (token: string) => {
+    addSessionLog('🔑 Проверяю токен...');
     
-    if (!oauthToken.trim()) {
-      console.log('❌ 2. ТОКЕН ПУСТОЙ');
-      addLog('❌ Введите OAuth токен');
-      return false;
-    }
-
-    console.log('✅ 2. ТОКЕН ЕСТЬ:', oauthToken.slice(0, 15) + '...');
-    
-    // Обновляем UI
-    addLog('🔑 Тестирую токен...');
-    const authData = { ...safeData, status: 'auth' as const, progress: 30 };
-    console.log('🔄 3. Обновляю статус на auth');
-    onSave(authData);
-
     try {
-      console.log('🌐 4. Отправляю fetch запрос...');
-      const response = await fetch('https://cloud-api.yandex.net/v1/disk/resources?path=%2F', {
-        method: 'GET',
-        headers: { 
-          'Authorization': `OAuth ${oauthToken}`,
-          'Accept': 'application/json'
-        }
+      const response = await fetch('https://cloud-api.yandex.net/v1/disk/', {
+        headers: { 'Authorization': `OAuth ${token}` }
       });
 
-      console.log('📡 5. ПОЛУЧЕН ОТВЕТ:', response.status, response.statusText);
-      console.log('📡 5.1 Headers:', Object.fromEntries(response.headers.entries()));
-      addLog(`Токен: ${response.status} ${response.statusText}`);
-
       if (response.ok) {
-        console.log('✅ 6. ТОКЕН РАБОТАЕТ! Парсю JSON...');
         const data = await response.json();
-        console.log('📂 6.1 Корневых папок:', data._embedded?.items?.length || 0);
-        console.log('📂 6.2 Первые папки:', data._embedded?.items?.slice(0, 3).map((i: any) => i.name));
+        const accountInfo = {
+          login: data.user?.login || 'unknown',
+          displayName: data.user?.display_name || 'Яндекс'
+        };
         
-        const rootFolders = data._embedded?.items?.length || 0;
-        addLog(`✅ Токен работает! Корневых папок: ${rootFolders}`);
+        addSessionLog(`✅ Авторизован: ${accountInfo.displayName} (@${accountInfo.login})`);
         
         const validData = { 
           ...safeData, 
           status: 'idle' as const, 
-          progress: 100,
-          oauthToken,
-          isTokenValid: true 
+          progress: 100, 
+          oauthToken: token,
+          isTokenValid: true,
+          yandexAccount: accountInfo
         };
-        console.log('💾 7. Сохраняю ВАЛИДНЫЙ токен');
         onSave(validData);
-        console.log('✅ === TEST TOKEN УСПЕХ ===');
-        return true;
       } else {
-        console.log('❌ 6. ТОКЕН НЕ РАБОТАЕТ');
         const errorText = await response.text();
-        console.error('❌ 6.1 ОШИБКА СЕРВЕРА:', errorText);
-        addLog(`❌ Ошибка токена: ${errorText.slice(0, 100)}...`);
-        
-        const invalidData = { 
-          ...safeData, 
-          status: 'error' as const, 
-          progress: 0,
-          isTokenValid: false 
-        };
-        console.log('💾 7. Сохраняю НЕВАЛИДНЫЙ токен');
-        onSave(invalidData);
-        console.log('❌ === TEST TOKEN НЕВАЛИДЕН ===');
-        return false;
+        addSessionLog(`❌ Ошибка токена: ${errorText.slice(0, 100)}`);
       }
     } catch (error: any) {
-      console.error('💥 6. СЕТЕВАЯ ОШИБКА:', error);
-      addLog(`💥 Ошибка сети: ${error.message}`);
-      const invalidData = { ...safeData, status: 'error' as const, isTokenValid: false };
-      onSave(invalidData);
-      console.log('💥 === TEST TOKEN СЕТЬ ОШИБКА ===');
-      return false;
+      addSessionLog(`💥 Ошибка: ${error.message}`);
+    }
+  };
+
+  const handleYandexLogin = () => {
+    if (!clientId.trim()) {
+      addSessionLog('❌ Введите Client ID');
+      return;
+    }
+
+    const redirectUri = window.location.origin + '/admin';
+    const authUrl = `https://oauth.yandex.ru/authorize?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+    
+    addSessionLog('🔐 Открываю окно авторизации...');
+    
+    const width = 600;
+    const height = 700;
+    const left = (screen.width - width) / 2;
+    const top = (screen.height - height) / 2;
+    
+    window.open(
+      authUrl,
+      'yandex-auth',
+      `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`
+    );
+  };
+
+  const handleLogout = () => {
+    const accountName = safeData.yandexAccount?.displayName || 'unknown';
+    setOauthToken('');
+    setSessionLog([]);
+    const clearedData = { 
+      ...safeData, 
+      status: 'idle' as const, 
+      progress: 0,
+      oauthToken: '',
+      isTokenValid: false,
+      yandexAccount: undefined,
+      log: [],
+      scanResult: null
+    };
+    onSave(clearedData);
+    addSessionLog(`🚪 Выход из @${accountName} выполнен`);
+  };
+
+  // Проверить наличие папки на диске
+  const checkFolder = async () => {
+    if (!folderPath.trim() || !isAuthenticated) {
+      addSessionLog('❌ Укажите путь к папке');
+      return;
+    }
+
+    // Исправляем путь
+    let correctPath = folderPath.trim();
+    if (!correctPath.startsWith('disk:/') && !correctPath.startsWith('disk:')) {
+      correctPath = 'disk:/' + correctPath;
+    } else if (correctPath.startsWith('disk:') && !correctPath.startsWith('disk:/')) {
+      correctPath = correctPath.replace('disk:', 'disk:/');
+    }
+
+    addSessionLog(`🔍 Проверяю папку: ${correctPath}`);
+    
+    try {
+      const response = await fetch('/api/autoupload/check-folder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          folderPath: correctPath, 
+          oauthToken: safeData.oauthToken
+        }),
+      });
+
+      const result = await response.json();
+      
+      addSessionLog(`📥 Ответ получен!`);
+      addSessionLog(`   success: ${result.success}`);
+      addSessionLog(`   items: ${result.items?.length || 0}`);
+      
+      // Добавляем логи сервера в сессию
+      if (result.logs && result.logs.length > 0) {
+        addSessionLog('--- Логи сервера ---');
+        result.logs.forEach((log: string) => addSessionLog(log));
+      } else {
+        addSessionLog('⚠️ Логов от сервера нет!');
+      }
+      
+      if (result.success) {
+        if (result.found) {
+          addSessionLog(`✅ Папка найдена: "${result.folderName}"`);
+          addSessionLog(`📁 Файлов: ${result.fileCount}`);
+        } else {
+          addSessionLog(`❌ Папка не найдена: ${folderPath}`);
+        }
+      } else {
+        addSessionLog(`❌ Ошибка: ${result.error}`);
+        if (result.code) addSessionLog(`🔢 Код: ${result.code}`);
+      }
+    } catch (error: any) {
+      addSessionLog(`❌ Ошибка проверки: ${error.message}`);
     }
   };
 
   const scanFolder = async () => {
-    console.log('🔍 === SCAN FOLDER НАЧАЛО ===');
-    
     if (!folderPath.trim()) {
-      console.log('❌ folderPath пустой');
-      addLog('❌ Укажите путь к папке');
+      addSessionLog('❌ Укажите путь к папке');
       return;
     }
-    if (!safeData.isTokenValid) {
-      console.log('❌ Токен не авторизован');
-      addLog('❌ Сначала авторизуйте токен');
+    if (!isAuthenticated) {
+      addSessionLog('❌ Сначала авторизуйтесь');
       return;
+    }
+
+    // Исправляем путь - добавляем disk:/ если нет
+    let correctPath = folderPath.trim();
+    if (!correctPath.startsWith('disk:/') && !correctPath.startsWith('disk:')) {
+      correctPath = 'disk:/' + correctPath;
+      addSessionLog(`📝 Путь исправлен: ${correctPath}`);
+    } else if (correctPath.startsWith('disk:') && !correctPath.startsWith('disk:/')) {
+      correctPath = correctPath.replace('disk:', 'disk:/');
+      addSessionLog(`📝 Путь исправлен: ${correctPath}`);
     }
 
     setIsProcessing(true);
+    setSessionLog([]);
+    
     const scanTypeLabel = activeScanType === 'programs' ? 'Программы' : 
                          activeScanType === 'trainers' ? 'Тренеров' : 'Слайдеры';
     
-    console.log('🔍 Сканирую:', scanTypeLabel, folderPath);
-    addLog(`🔍 Сканирую ${scanTypeLabel} в "${folderPath}"`);
+    addSessionLog(`🔍 Сканирую ${scanTypeLabel}...`);
+    addSessionLog(`📂 Папка: ${folderPath}`);
     
-    const scanData = { ...safeData, status: 'scanning' as const, progress: 10, scanResult: null };
+    const scanData = { ...safeData, status: 'scanning' as const, progress: 10, scanResult: null, log: [] };
     onSave(scanData);
 
     try {
-      console.log('🌐 Отправляю POST /api/autoupload');
+      addSessionLog(`📤 Отправляю запрос на сервер...`);
+      
       const response = await fetch('/api/autoupload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          folderPath, 
+          folderPath: correctPath, 
           oauthToken: safeData.oauthToken, 
           scanType: activeScanType 
         }),
       });
 
-      console.log('📡 API ответ:', response.status);
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ API ОШИБКА:', errorText);
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-      }
-
       const result = await response.json();
-      console.log('✅ API УСПЕХ:', result);
       
       if (result.success) {
-        addLog(`✅ ${result[`${activeScanType}Found`]||0} ${scanTypeLabel.toLowerCase()} найдено`);
+        addSessionLog(`✅ Найдено: ${result.validItems || 0} элементов`);
+        
         const finalData = { 
           ...safeData, 
           status: 'success' as const, 
           progress: 100, 
-          scanResult: result 
+          scanResult: result
         };
         onSave(finalData);
       } else {
-        throw new Error(result.error || 'Неизвестная ошибка API');
+        addSessionLog(`❌ ОШИБКА: ${result.error}`);
+        if (result.code) addSessionLog(`🔢 Код ошибки: ${result.code}`);
+        
+        if (result.logs && result.logs.length > 0) {
+          addSessionLog('--- Логи сервера ---');
+          result.logs.forEach((l: string) => addSessionLog(l));
+        }
+        
+        const errorData = { ...safeData, status: 'error' as const, progress: 0 };
+        onSave(errorData);
       }
     } catch (error: any) {
-      console.error('💥 SCAN ОШИБКА:', error);
-      addLog(`❌ ${error.message}`);
+      addSessionLog(`❌ ИСКЛЮЧЕНИЕ: ${error.message}`);
+      if (error.stack) {
+        addSessionLog(`Stack: ${error.stack.substring(0, 200)}`);
+      }
+      
       const errorData = { ...safeData, status: 'error' as const, progress: 0 };
       onSave(errorData);
     } finally {
       setIsProcessing(false);
-      console.log('🏁 === SCAN FOLDER КОНЕЦ ===');
     }
   };
-
-  console.log('🎨 JSX РЕНДЕР. Статус:', safeData.status, 'Токен:', !!oauthToken, 'Валиден:', safeData.isTokenValid);
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h3>Автозагрузка контента</h3>
-        <p>📄 Программы • 👨‍🏫 Тренера • 🖼️ Слайдеры (Яндекс.Диск API)</p>
+        <h3>☁️ Автозагрузка контента</h3>
+        <p>📄 Программы • 👨‍🏫 Тренера • 🖼️ Слайдеры</p>
       </div>
 
-      {/* === ОAUTH ТОКЕН === */}
-      <div className={styles.field}>
-        <label>OAuth токен Яндекс.Диск <span className={styles.required}>*</span></label>
-        <input
-          type="password"
-          value={oauthToken}
-          onChange={(e) => {
-            console.log('✏️ Токен изменен:', e.target.value ? e.target.value.slice(0, 10) + '...' : 'пустой');
-            setOauthToken(e.target.value);
-          }}
-          placeholder="y0_Agxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-          className={`${styles.input} ${safeData.isTokenValid ? styles.valid : safeData.status === 'error' ? styles.invalid : ''}`}
-        />
-        <small>
-          <strong>Получить:</strong> oauth.yandex.ru → Создать приложение → Яндекс.Диск REST API → <br/>
-          https://oauth.yandex.ru/authorize?response_type=token&client_id=YOUR_ID
-        </small>
-        
-        <button
-          onClick={() => {
-            console.log('🔘 === КНОПКА "ПРОВЕРИТЬ ТОКЕН" КЛИК! ===');
-            testToken();
-          }}
-          disabled={!oauthToken.trim() || safeData.status === 'auth'}
-          className={`${styles.authBtn} ${safeData.isTokenValid ? styles.success : ''}`}
-        >
-          {safeData.status === 'auth' ? '🔄 Проверяю...' : 
-           safeData.isTokenValid ? '✅ Токен OK' : '🔑 Проверить токен'}
-        </button>
-      </div>
-
-      {/* === СКАНИРОВАНИЕ (только после авторизации) === */}
-      {safeData.isTokenValid && (
-        <>
+      {/* === НЕ АВТОРИЗОВАН === */}
+      {!isAuthenticated ? (
+        <div className={styles.authSection}>
           <div className={styles.field}>
-            <label>Путь к папке <span className={styles.required}>*</span></label>
+            <label>Client ID приложения</label>
+            <input
+              type="text"
+              value={clientId}
+              onChange={(e) => setClientId(e.target.value)}
+              placeholder="Ваш Client ID из oauth.yandex.ru"
+              className={styles.input}
+            />
+            <small>
+              Получить на <a href="https://oauth.yandex.ru/" target="_blank" rel="noopener">oauth.yandex.ru</a><br/>
+              Приложение → Яндекс.Диск (чтение/запись)
+            </small>
+          </div>
+          
+          <button
+            onClick={handleYandexLogin}
+            disabled={!clientId.trim()}
+            className={styles.authBtn}
+          >
+            🔑 Войти в Яндекс.ID
+          </button>
+          
+          <p className={styles.hint}>
+            После нажатия откроется окно Яндекса. Авторизуйтесь — и появится форма загрузки.
+          </p>
+        </div>
+      ) : (
+        /* === АВТОРИЗОВАН === */
+        <div className={styles.scanSection}>
+          {safeData.yandexAccount && (
+            <div className={styles.accountInfo}>
+              <div className={styles.avatar}>
+                {safeData.yandexAccount.displayName.charAt(0).toUpperCase()}
+              </div>
+              <div className={styles.accountDetails}>
+                <div className={styles.accountName}>{safeData.yandexAccount.displayName}</div>
+                <div className={styles.accountLogin}>@{safeData.yandexAccount.login}</div>
+              </div>
+              <button onClick={handleLogout} className={styles.logoutLink}>
+                Выйти
+              </button>
+            </div>
+          )}
+
+          <div className={styles.field}>
+            <label>Путь к папке на Яндекс.Диске</label>
             <input
               value={folderPath}
-              onChange={(e) => {
-                console.log('📁 Путь изменен:', e.target.value);
-                setFolderPath(e.target.value);
-              }}
-              placeholder="/форматированные Данные для сайта"
+              onChange={(e) => setFolderPath(e.target.value)}
+              placeholder="disk:/Моя папка"
               className={styles.input}
               disabled={isProcessing}
             />
-            <small>Путь от корня диска. Будет найдена подпапка "программы"/"тренера"/"слайдеры"</small>
+            <small>Формат: disk:/Название папки</small>
           </div>
-
+          
+          <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
+            <button
+              onClick={checkFolder}
+              disabled={!folderPath.trim() || isProcessing}
+              className={styles.checkFolderBtn}
+            >
+              🔍 Проверить папку
+            </button>
+          </div>
+          
           <div className={styles.scanTypeSection}>
             <button 
               className={`${styles.scanTypeBtn} ${activeScanType === 'programs' ? styles.active : ''}`}
-              onClick={() => {
-                console.log('🔘 Переключение на Программы');
-                setActiveScanType('programs');
-              }}
+              onClick={() => setActiveScanType('programs')}
               disabled={isProcessing}
             >
               📄 Программы
             </button>
             <button 
               className={`${styles.scanTypeBtn} ${activeScanType === 'trainers' ? styles.active : ''}`}
-              onClick={() => {
-                console.log('🔘 Переключение на Тренеров');
-                setActiveScanType('trainers');
-              }}
+              onClick={() => setActiveScanType('trainers')}
               disabled={isProcessing}
             >
               👨‍🏫 Тренера
             </button>
             <button 
               className={`${styles.scanTypeBtn} ${activeScanType === 'sliders' ? styles.active : ''}`}
-              onClick={() => {
-                console.log('🔘 Переключение на Слайдеры');
-                setActiveScanType('sliders');
-              }}
+              onClick={() => setActiveScanType('sliders')}
               disabled={isProcessing}
             >
               🖼️ Слайдеры
@@ -300,15 +403,11 @@ export default function AutoUpload({ autouploadData, onSave }: AutoUploadProps) 
             disabled={!folderPath.trim() || isProcessing}
             className={`${styles.scanBtn} ${isProcessing ? styles.processing : ''}`}
           >
-            {isProcessing 
-              ? `🔍 Сканирую ${activeScanType.toUpperCase()}...` 
-              : `🔍 Сканировать ${activeScanType}`
-            }
+            {isProcessing ? `🔍 Сканирую ${activeScanType}...` : `📥 Загрузить ${activeScanType}`}
           </button>
-        </>
+        </div>
       )}
 
-      {/* === ПРОГРЕСС === */}
       <div className={styles.progressSection}>
         <div className={styles.progressBar}>
           <div className={styles.progressFill} style={{ width: `${safeData.progress}%` }} />
@@ -316,48 +415,277 @@ export default function AutoUpload({ autouploadData, onSave }: AutoUploadProps) 
         <span>{Math.round(safeData.progress)}%</span>
       </div>
 
-      {/* === РЕЗУЛЬТАТЫ === */}
-      {safeData.scanResult && (
+      {safeData.scanResult && safeData.scanResult.items && (
         <div className={styles.resultsSection}>
-          <h4>✅ Результат сканирования:</h4>
-          <div className={styles.statsGrid}>
-            <div className={styles.statCard}>
-              <div className={styles.statNumber}>{safeData.scanResult.programsFound || 0}</div>
-              <div className={styles.statLabel}>Программы</div>
-            </div>
-            <div className={styles.statCard}>
-              <div className={styles.statNumber}>{safeData.scanResult.trainersFound || 0}</div>
-              <div className={styles.statLabel}>Тренера</div>
-            </div>
-            <div className={styles.statCard}>
-              <div className={styles.statNumber}>{safeData.scanResult.slidersFound || 0}</div>
-              <div className={styles.statLabel}>Слайдеры</div>
-            </div>
+          <h4>✅ Найдено: {safeData.scanResult.items.length} программ</h4>
+          <div className={styles.itemsList}>
+            {safeData.scanResult.items.map((item: any, index: number) => (
+              <div key={index} className={styles.itemCard}>
+                <div className={styles.itemHeader}>
+                  <span className={styles.itemName}>{item.name}</span>
+                  <div className={styles.itemBadges}>
+                    {item.hasDocx && <span className={styles.badgeDocx}>📄 {item.docxFiles?.length || 1} DOCX</span>}
+                    {item.hasImages && <span className={styles.badgeImages}>🖼️ {item.imagePaths?.length || 0} фото</span>}
+                    <span className={styles.badgeTotal}>📁 {item.totalFiles || 0} файлов</span>
+                  </div>
+                </div>
+                
+                {/* Превью изображения - показываем если есть */}
+                {item.hasImages && (
+                  <div className={styles.previewSection}>
+                    {item.previewImage ? (
+                      <img src={item.previewImage} alt={item.name} className={styles.previewImage} />
+                    ) : (
+                      <div className={styles.noPreview}>🖼️ {item.imagePaths?.[0]?.name || 'Изображение'}</div>
+                    )}
+                  </div>
+                )}
+                
+                <div className={styles.itemDetails}>
+                  {/* Текст из DOCX */}
+                  {item.descriptionLines && item.descriptionLines.length > 0 && (
+                    <div className={styles.descriptionSection}>
+                      <div className={styles.descriptionHeader}>
+                        📄 {item.descriptionFileName || 'Описание'}
+                      </div>
+                      <div className={styles.descriptionContent}>
+                        <div className={styles.descriptionText}>
+                          {item.descriptionLines.map((line: string, lineIndex: number) => (
+                            <div key={lineIndex} className={styles.descriptionLine}>
+                              {line}
+                              {lineIndex < item.descriptionLines.length - 1 && (
+                                <div className={styles.separator}>====</div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Все загруженные фото */}
+                  {item.uploadedImages && item.uploadedImages.length > 0 && (
+                    <div className={styles.uploadedImagesSection}>
+                      <div className={styles.fileGroupLabel}>🖼️ Загруженные фото ({item.uploadedImages.length}):</div>
+                      <div className={styles.imagesGrid}>
+                        {item.uploadedImages.map((img: any, imgIndex: number) => (
+                          <div key={imgIndex} className={styles.uploadedImageItem}>
+                            <img src={img.localPath} alt={img.name} className={styles.uploadedImage} />
+                            <div className={styles.imageName}>{img.name}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Если нет текста - показываем файлы */}
+                  {(!item.descriptionLines || item.descriptionLines.length === 0) && (
+                    <div className={styles.fileGroup}>
+                      <div className={styles.fileGroupLabel}>📋 Файлы в папке:</div>
+                      <div className={styles.fileList}>
+                        {item.allFiles && item.allFiles.map((f: any, fIndex: number) => (
+                          <div key={fIndex} className={`${styles.fileItem} ${f.extension === 'docx' ? styles.fileDocx : ''}`}>
+                            {f.extension?.toLowerCase() === 'docx' ? '📄' : '🖼️'} {f.name}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                <div className={styles.itemPath}>
+                  📍 {item.path}
+                </div>
+              </div>
+            ))}
           </div>
+          
           <div className={styles.targetFolder}>
-            📁 Папка: <strong>{safeData.scanResult.targetFolder}</strong> 
-            ({safeData.scanResult.totalSubfolders || 0} подпапок)
+            📁 Папка: <strong>{safeData.scanResult.targetFolder}</strong>
           </div>
         </div>
       )}
 
-      {/* === ЖУРНАЛ === */}
-      <div className={styles.logSection}>
-        <h4>Журнал ({safeData.log.length})</h4>
-        <div className={styles.log}>
-          {safeData.log.map((entry, index) => (
-            <div key={index} className={styles.logEntry}>{entry}</div>
+      {/* === ПОЛНЫЙ ПРЕДПРОСМОТР РАСПАРСЕННЫХ ПРОГРАММ === */}
+      {safeData.scanResult && safeData.scanResult.parsedPrograms && safeData.scanResult.parsedPrograms.length > 0 && (
+        <div className={styles.parsedSection}>
+          <h4>📋 Предпросмотр программ (после парсинга):</h4>
+          
+          {safeData.scanResult.parsedPrograms.map((program: any, index: number) => (
+            <div key={index} className={styles.parsedProgramCard}>
+              {/* Заголовок программы */}
+              <div className={styles.parsedHeader}>
+                <h3 className={styles.parsedName}>{program.parsed?.name || program.name}</h3>
+                <span className={styles.parsedBadge}>✅ Распарсено</span>
+              </div>
+
+              {/* Главное фото - используем реальный путь */}
+              {(program.image || program.uploadedImages?.[0]?.localPath) && (
+                <div className={styles.parsedMainImage}>
+                  <img src={program.image || program.uploadedImages[0]?.localPath} alt={program.name} />
+                </div>
+              )}
+
+              {/* Описание */}
+              {program.parsed?.description && (
+                <div className={styles.parsedDescription}>
+                  <strong>📝 Описание:</strong>
+                  <p>{program.parsed.description}</p>
+                </div>
+              )}
+
+              {/* Тренеры - показываем как ссылки если найдены в БД */}
+              {program.parsed?.trainers && program.parsed.trainers.length > 0 && (
+                <div className={styles.parsedTrainers}>
+                  <strong>👨‍🏫 Тренеры:</strong>
+                  <div className={styles.trainerList}>
+                    {program.parsed.trainers.map((trainer: string, tIdx: number) => {
+                      // Проверяем, найден ли тренер в БД
+                      const matchedId = program.parsed.matchedTrainerIds?.[tIdx];
+                      const foundTrainer = matchedId 
+                        ? safeData.scanResult.existingTrainers?.find((t: any) => String(t.id) === String(matchedId))
+                        : null;
+                      const isMatched = !!foundTrainer;
+                      const isUnmatched = program.parsed.unmatchedTrainers?.includes(trainer);
+                      
+                      if (isMatched && foundTrainer) {
+                        // Показываем как ссылку на страницу тренера
+                        return (
+                          <a 
+                            key={tIdx} 
+                            href={`/trainers/${foundTrainer.id}`}
+                            target="_blank"
+                            className={`${styles.trainerLink} ${styles.trainerMatched}`}
+                            title={`Перейти на страницу тренера ${foundTrainer.name}`}
+                          >
+                            <img 
+                              src={foundTrainer.image} 
+                              alt={foundTrainer.name}
+                              className={styles.trainerLinkAvatar}
+                            />
+                            <span>{foundTrainer.name}</span>
+                            <span className={styles.trainerLinkCheck}>✓</span>
+                          </a>
+                        );
+                      }
+                      
+                      // Не найден - показываем просто имя
+                      return (
+                        <span 
+                          key={tIdx} 
+                          className={`${styles.trainerBadge} ${isUnmatched ? styles.trainerUnmatched : ''}`}
+                          title={isUnmatched ? 'Не найден в БД - будет добавлен как имя' : 'Будет добавлен как имя'}
+                        >
+                          {isUnmatched ? '⚠️' : '?'} {trainer}
+                        </span>
+                      );
+                    })}
+                  </div>
+                  {program.parsed.unmatchedTrainers && program.parsed.unmatchedTrainers.length > 0 && (
+                    <div className={styles.unmatchedWarning}>
+                      ⚠️ Не найдены в БД: {program.parsed.unmatchedTrainers.join(', ')}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Расписание тренировок */}
+              {program.parsed?.workouts && program.parsed.workouts.length > 0 && (
+                <div className={styles.parsedWorkouts}>
+                  <strong>📅 Расписание:</strong>
+                  <div className={styles.workoutList}>
+                    {program.parsed.workouts.map((workout: any, wIdx: number) => (
+                      <div key={wIdx} className={styles.workoutItem}>
+                        <span className={styles.workoutDay}>{workout.day}</span>
+                        <span className={styles.workoutTime}>🕐 {workout.time}</span>
+                        {workout.params && workout.params.length > 0 && (
+                          <span className={styles.workoutParams}>
+                            {workout.params.map((p: string, i: number) => (
+                              <span key={i} className={styles.paramTag}>--{p}</span>
+                            ))}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Галерея - используем real paths */}
+              {program.parsed?.gallery && program.parsed.gallery.length > 0 && (
+                <div className={styles.parsedGallery}>
+                  <strong>🖼️ Галерея ({program.parsed.gallery.length} фото):</strong>
+                  <div className={styles.galleryGrid}>
+                    {program.parsed.gallery.map((photo: any, pIdx: number) => (
+                      <div key={pIdx} className={styles.galleryItem}>
+                        {/* Используем fullPath из парсинга (сервер уже сопоставил) */}
+                        {photo.fullPath ? (
+                          <img 
+                            src={photo.fullPath} 
+                            alt={photo.filename}
+                            className={styles.galleryPhoto}
+                          />
+                        ) : (
+                          <div className={styles.galleryPlaceholder}>🖼️</div>
+                        )}
+                        <div className={styles.galleryCaption}>
+                          {photo.filename}
+                          {photo.caption && <span className={styles.captionText}> - {photo.caption}</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Если есть дополнительные фото (не вошедшие в галерею из docx) */}
+              {program.uploadedImages && program.uploadedImages.length > (program.parsed?.gallery?.length || 0) + 1 && (
+                <div className={styles.uploadedImagesSection}>
+                  <div className={styles.fileGroupLabel}>📸 Дополнительные фото ({program.uploadedImages.length - (program.parsed?.gallery?.length || 0) - 1}):</div>
+                  <div className={styles.imagesGrid}>
+                    {program.uploadedImages.slice((program.parsed?.gallery?.length || 0) + 1).map((img: any, imgIdx: number) => (
+                      <div key={imgIdx} className={styles.uploadedImageItem}>
+                        <img src={img.localPath} alt={img.name} className={styles.uploadedImage} />
+                        <div className={styles.imageName}>{img.name}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Кнопка сохранения */}
+              <button 
+                className={styles.saveProgramBtn}
+                onClick={() => {
+                  console.log('Сохраняю программу:', program);
+                  alert(`Программа "${program.name}" будет сохранена в БД!`);
+                }}
+              >
+                💾 Сохранить программу
+              </button>
+            </div>
           ))}
         </div>
-      </div>
+      )}
 
-      {/* === СТАТУС === */}
+      {sessionLog.length > 0 && (
+        <div className={styles.logSection}>
+          <h4>📋 Журнал сессии ({sessionLog.length})</h4>
+          <div className={styles.log}>
+            {sessionLog.map((entry, index) => (
+              <div key={index} className={styles.logEntry}>{entry}</div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className={styles.status}>
         <span className={`${styles.statusBadge} ${styles[safeData.status]}`}>
           {safeData.status === 'idle' ? 'Готов' : 
            safeData.status === 'auth' ? 'Авторизация' : 
            safeData.status === 'scanning' ? 'Сканирую' : 
-           safeData.status === 'success' ? 'Готово' : 'Ошибка'}
+           safeData.status === 'success' ? 'Готово' : 
+           safeData.status === 'error' ? 'Ошибка' : 'Готов'}
         </span>
       </div>
     </div>

@@ -1,6 +1,8 @@
 'use client';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import GridSettings from '@/components/ui/GridSettings';
 import styles from './HomeTrainers.module.css';
 
 interface Trainer {
@@ -8,6 +10,7 @@ interface Trainer {
   image: string;
   name: string;
   specialty: string;
+  photoAlbum?: { image: string; caption?: string }[];
 }
 
 interface HomeTrainersProps {
@@ -21,7 +24,17 @@ export default function HomeTrainers({
   openCallModal, 
   openImageModal 
 }: HomeTrainersProps) {
+  const [gridCols, setGridCols] = useState(3);
   const safeTrainers: Trainer[] = Array.isArray(trainers) ? trainers : [];
+
+  // Определяем класс сетки
+  const gridClass = {
+    1: 'grid-cols-1',
+    2: 'grid-cols-1 md:grid-cols-2',
+    3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+    4: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
+    5: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-5',
+  }[gridCols] || 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
 
   return (
     <section id="trainers" className={styles.trainers}>
@@ -31,42 +44,59 @@ export default function HomeTrainers({
         </h2>
         
         {safeTrainers.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {safeTrainers.map((trainer) => (
-              <div key={trainer.id} className="text-center group">
-                <div 
-                  className="w-80 h-96 mx-auto bg-white rounded-br-[1%] shadow-2xl overflow-hidden group-hover:shadow-3xl transition-all duration-500 hover:-translate-y-2 cursor-pointer"
-                  onClick={() => openImageModal(trainer.image, trainer.name)}
-                >
-                  <Image 
-                    src={trainer.image} 
-                    alt={trainer.name} 
-                    width={320} 
-                    height={400} 
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <div className="mt-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{trainer.name}</h3>
-                  <p className="text-xl text-gray-600 mb-6">{trainer.specialty}</p>
-                  <div className="flex gap-3">
-                    <button 
-                      className="flex-1 px-6 py-3 bg-emerald-600 text-white font-semibold rounded-md hover:bg-emerald-700 transition-all shadow-md hover:shadow-lg"
-                      onClick={() => openCallModal(`Тренер ${trainer.name}`)}
+          <>
+            {/* Настройки сетки */}
+            <GridSettings defaultCols={3} onChange={setGridCols} />
+            
+            <div className={`grid ${gridClass} gap-6 mb-12`}>
+              {safeTrainers.map((trainer) => {
+                const photoCount = trainer.photoAlbum?.length || 0;
+                return (
+                <div key={trainer.id} className="text-center group">
+                  {/* Отогнутый уголок - красный для тренеров */}
+                  <div className="relative bg-white shadow-md overflow-hidden border-2 border-gray-200 hover:border-red-500 transition-all hover:shadow-xl">
+                    <div className="absolute top-0 right-0 w-10 h-10 bg-gradient-to-bl from-transparent to-red-500 z-10" />
+                    <div className="absolute top-0 right-0 w-14 h-14 bg-gradient-to-bl from-transparent to-red-400 opacity-50 translate-x-2 -translate-y-2" />
+                    
+                    <div 
+                      className="w-full h-64 mx-auto bg-gray-100 overflow-hidden cursor-pointer relative"
+                      onClick={() => openImageModal(trainer.image, trainer.name)}
                     >
-                      Записаться
-                    </button>
-                    <Link 
-                      href={`/trainers/${trainer.id}`}
-                      className="px-6 py-3 bg-white text-emerald-600 font-semibold rounded-md border-2 border-emerald-600 hover:bg-emerald-600 hover:text-white transition-all shadow-md hover:shadow-lg"
-                    >
-                      Подробнее
-                    </Link>
+                      {photoCount > 0 && (
+                        <div className="absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-semibold z-5 flex items-center gap-1">
+                          📷 {photoCount}
+                        </div>
+                      )}
+                      <Image 
+                        src={trainer.image} 
+                        alt={trainer.name} 
+                        width={320} 
+                        height={400} 
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-lg font-bold text-gray-900">{trainer.name}</h3>
+                      <div className="flex gap-2">
+                        <button 
+                          className="flex-1 px-4 py-2 bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-700 transition-all"
+                          onClick={() => openCallModal(`Тренер ${trainer.name}`)}
+                        >
+                          Записаться
+                        </button>
+                        <Link 
+                          href={`/trainers/${trainer.id}`}
+                          className="px-4 py-2 bg-white text-emerald-600 font-semibold text-sm border-2 border-emerald-600 hover:bg-emerald-600 hover:text-white transition-all"
+                        >
+                          Подробнее
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              )})}
+            </div>
+          </>
         ) : (
           <div className="text-center py-20">
             <p className="text-xl text-gray-500">Тренеров скоро добавят</p>

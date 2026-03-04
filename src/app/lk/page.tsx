@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Header from '@/components/Header';
+import SiteHeader from '@/components/ui/SiteHeader';
 import Footer from '@/components/Footer';
 import SectionSpacer from '@/components/ui/SectionSpacer';
 import CallModal from '@/components/ui/CallModal';
@@ -107,9 +107,9 @@ export default function LkPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header 
+      <SiteHeader 
         pageTitle="Личный кабинет клиента"
-        openCallModal={openCallModal}
+        onOpenCallModal={openCallModal}
       />
 
       <SectionSpacer height="lg" background="default" />

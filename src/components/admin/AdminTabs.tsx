@@ -10,13 +10,17 @@ export default function AdminTabs({ activeTab, onTabChange }: AdminTabsProps) {
   const tabs = [
     { id: 'sliders', label: '📸 Слайдер', countKey: 'sliders' },
     { id: 'schedulePrices', label: '📅💰 Расписание и Цены', countKey: 'schedulePrices' },
+    { id: 'workouts', label: '📋 Тренировки', countKey: 'workouts' },
     { id: 'programs', label: '🎯 Программы', countKey: 'programs' },
     { id: 'staff', label: '👨‍🏫 Сотрудники', countKey: 'staff' },
     { id: 'news', label: '📰 Новости', countKey: 'news' },
     { id: 'contacts', label: '📞 Контакты', countKey: 'contacts' },
     { id: 'sections', label: '🏗️ Разделы', countKey: 'sections' }, 
+    { id: 'dividers', label: '🎨 Разделители', countKey: 'dividers' },
     { id: 'settings', label: '⚙️ Настройки', countKey: 'settings' },
-    {id: 'autoupload',label: 'Автозагрузка',countKey: 'autoupload'}
+    { id: 'stats', label: '📊 Статистика', countKey: 'stats' },
+    { id: 'autoupload', label: '☁️ Автозагрузка', countKey: 'autoupload'},
+    { id: 'files', label: '📁 Файлы и память', countKey: 'files'}
   ];
 
   return (

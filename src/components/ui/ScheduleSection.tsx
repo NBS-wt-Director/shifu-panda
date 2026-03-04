@@ -1,4 +1,5 @@
 import { type FC } from 'react';
+import Link from 'next/link';
 
 interface ScheduleSectionProps {
   scheduleImages: string[];
@@ -20,6 +21,14 @@ const ScheduleSection: FC<ScheduleSectionProps> = ({ scheduleImages }) => {
           {scheduleImages.map((image, index) => (
             <img key={index} src={image} alt={`Расписание ${index + 1}`} className="rounded-3xl shadow-2xl w-full h-[500px] object-cover" />
           ))}
+        </div>
+        <div className="text-center mt-12">
+          <Link 
+            href="/schedule" 
+            className="inline-block px-8 py-4 bg-gradient-to-r from-emerald-600 to-green-500 text-white text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:from-emerald-700 hover:to-green-600 transition-all transform hover:scale-105"
+          >
+            📅 Открыть полное расписание
+          </Link>
         </div>
       </div>
     </section>

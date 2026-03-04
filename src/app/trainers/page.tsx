@@ -2,14 +2,18 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Loader2, Users, UserCog } from 'lucide-react';
-import Header from '@/components/Header';
+import SiteHeader from '@/components/ui/SiteHeader';
 import Footer from '@/components/Footer';
+import CallModal from '@/components/ui/CallModal';
+import GridSettings from '@/components/ui/GridSettings';
 
 interface Trainer {
   id: string;
   name: string;
   image: string;
   experience?: string;
+  specialization?: string;
+  photoAlbum?: { image: string; caption?: string }[];
 }
 
 interface Staff {
@@ -24,7 +28,15 @@ export default function TrainersPage() {
   const [staff, setStaff] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-const [siteSettings, setSiteSettings] = useState({ clientNotification: '' });
+  const [siteSettings, setSiteSettings] = useState({ clientNotification: '' });
+  const [callModalOpen, setCallModalOpen] = useState(false);
+  const [callReason, setCallReason] = useState('Общий запрос');
+  const [gridCols, setGridCols] = useState(3);
+
+  const openCallModal = (reason: string) => {
+    setCallReason(reason);
+    setCallModalOpen(true);
+  };
   // Загрузка данных тренеров и сотрудников
   useEffect(() => {
     Promise.all([
@@ -63,18 +75,17 @@ const [siteSettings, setSiteSettings] = useState({ clientNotification: '' });
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header 
-       pageTitle='Наша команда'
+      <SiteHeader 
+        pageTitle="Наша команда"
+        onOpenCallModal={openCallModal}
       />
       
-      
-
       {/* Команда тренеров */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-20">
             <h3 className="text-4xl md:text-5xl font-black text-gray-400 mb-6">
-                Тренера
+                Наши тренеры
               </h3>
           </div>
 
@@ -89,49 +100,60 @@ const [siteSettings, setSiteSettings] = useState({ clientNotification: '' });
               </p>
             </div>
           ) : (
-            <div className="grid md:grid-cols-3 gap-8">
-              {trainers.map((trainer) => (
+            <>
+              {/* Настройки сетки */}
+              <GridSettings defaultCols={3} onChange={setGridCols} />
+              
+              {/* Определяем класс сетки */}
+              <div className={`grid ${
+                gridCols === 1 ? 'grid-cols-1' :
+                gridCols === 2 ? 'grid-cols-1 md:grid-cols-2' :
+                gridCols === 3 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' :
+                gridCols === 4 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' :
+                'grid-cols-1 md:grid-cols-2 lg:grid-cols-5'
+              } gap-6`}>
+                {trainers.map((trainer) => {
+                  const photoCount = trainer.photoAlbum?.length || 0;
+                  return (
                 <Link 
                   key={trainer.id} 
                   href={`/trainers/${trainer.id}`}
-                  className="group relative bg-gradient-to-br from-gray-50 to-gray-100 p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-6 hover:scale-105 border border-gray-100 hover:border-yellow-200 overflow-hidden h-[480px] flex flex-col"
+                  className="group relative bg-white p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 border-gray-200 hover:border-red-500 overflow-hidden flex flex-col"
                 >
-                {/* Фото БЕЗ обрезки */}
-<div className="relative flex-shrink-0 mb-8 h-72 rounded-3xl shadow-2xl group-hover:shadow-3xl transition-all duration-500 overflow-hidden mx-auto">
+                  {/* Отогнутый уголок - красный для тренеров */}
+                  <div className="absolute top-0 right-0 w-10 h-10 bg-gradient-to-bl from-transparent to-red-500 z-10" />
+                  <div className="absolute top-0 right-0 w-14 h-14 bg-gradient-to-bl from-transparent to-red-400 opacity-50 translate-x-2 -translate-y-2" />
+                  
+                {/* Фото */}
+                <div className="relative flex-shrink-0 mb-4 h-64 overflow-hidden mx-auto w-full bg-gray-100">
+                  {photoCount > 0 && (
+                    <div className="absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-semibold z-5 flex items-center gap-1">
+                      📷 {photoCount}
+                    </div>
+                  )}
   <img 
     src={trainer.image} 
     alt={trainer.name}
-    className="w-full h-full object-contain bg-gray-100 rounded-3xl group-hover:scale-105 transition-transform duration-500"  // ← object-contain
+    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
   />
-  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
 </div>
                   
                   {/* Имя */}
                   <div className="flex-1 flex flex-col justify-end">
-                    <h3 className="text-3xl font-black text-center mb-4 bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent group-hover:scale-105 transition-all">
+                    <h3 className="text-xl font-black text-center mb-2 text-gray-900">
                       {trainer.name}
                     </h3>
-                    {trainer.experience && (
-                      <p className="text-xl text-gray-600 text-center font-semibold">
-                        {trainer.experience}
-                      </p>
-                    )}
-                  </div>
-                  
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8">
-                    <span className="text-white text-xl font-bold bg-yellow-400/90 px-6 py-3 rounded-2xl shadow-2xl">
-                      Подробнее →
-                    </span>
                   </div>
                 </Link>
-              ))}
-            </div>
+              )})}
+              </div>
+            </>
           )}
         </div>
       </section>
 
-      {/* Помощники */}
+      {/* Помощники - показываем только если есть сотрудники */}
+      {staff.length > 0 && (
       <section className="py-24 bg-gradient-to-br from-gray-50 to-gray-100">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-20">
@@ -187,8 +209,15 @@ const [siteSettings, setSiteSettings] = useState({ clientNotification: '' });
           )}
         </div>
       </section>
+      )}
 
       <Footer />
+
+      <CallModal 
+        isOpen={callModalOpen}
+        onClose={() => setCallModalOpen(false)}
+        reason={callReason}
+      />
     </div>
   );
 }

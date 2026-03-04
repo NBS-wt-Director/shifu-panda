@@ -12,9 +12,9 @@ export async function GET(
     const programs = data.programs || [];
     
     // ✅ ИСПРАВЛЕНИЕ 1: Number(id) вместо id
-    const program = programs.find((p: any) => p.id === Number(id));
+    const program = programs.find((p: { id: number | string }) => Number(p.id) === Number(id));
     
-    console.log('🔍 Поиск программы:', id, 'Программы:', programs.map(p => ({id: p.id, name: p.name})));
+    console.log('🔍 Поиск программы:', id, 'Программы:', programs.map((p: { id: number | string; name: string }) => ({id: p.id, name: p.name})));
     
     if (!program) {
       console.warn(`⚠️ Программа ${id} не найдена, возвращаем демо`);
@@ -34,7 +34,32 @@ export async function GET(
     // ✅ ИСПРАВЛЕНИЕ 2: Добавляем логирование найденной программы
     console.log('✅ Найдена программа:', program.name);
     
-    return NextResponse.json(program);
+    // Формируем данные для фронтенда
+    const trainers = data.trainers || [];
+    const programTrainers = (program.trainers || []).map((trainerId: string | number) => {
+      const trainer = trainers.find((t: any) => Number(t.id) === Number(trainerId));
+      return trainer ? {
+        id: trainer.id,
+        name: trainer.name,
+        image: trainer.image,
+        experience: trainer.experience
+      } : null;
+    }).filter(Boolean);
+    
+    // Формируем ответ
+    const response = {
+      ...program,
+      // photoAlbum -> gallery для совместимости
+      gallery: (program.photoAlbum || []).map((p: any) => p.image),
+      // photoAlbum с полной информацией
+      photoAlbum: program.photoAlbum || [],
+      // Тренеры программы
+      trainers: programTrainers,
+      // Тренировки
+      workouts: program.workouts || []
+    };
+    
+    return NextResponse.json(response);
   } catch (error) {
     console.error('API программа error:', error);
     return NextResponse.json({

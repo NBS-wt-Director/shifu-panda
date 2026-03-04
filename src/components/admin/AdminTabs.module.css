@@ -27,6 +27,19 @@
     box-shadow: 0 10px 25px rgba(251, 191, 36, 0.3);
   }
   
+  /* Активная вкладка - подчёркивание */
+  .tabButton.active {
+    background: linear-gradient(135deg, rgb(59, 130, 246) 0%, rgb(37, 99, 235) 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    border-bottom: 3px solid rgb(251, 191, 36);
+  }
+  
+  .tabButton.active .tabIcon,
+  .tabButton.active .tabLabel {
+    color: white;
+  }
+  
   .tabIcon {
     font-size: 1.25rem;
   }

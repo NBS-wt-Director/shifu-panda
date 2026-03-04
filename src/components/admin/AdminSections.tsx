@@ -71,10 +71,51 @@ export default function AdminSections({ sections: initialSections, onSave }: Adm
     setSections(newSections);
     setHasChanges(true); // ✅ Отметить изменения
   };
+  // ✅ Функция сохранения на сервер
+  const saveToServer = async (sectionsToSave: Section[]) => {
+    try {
+      const response = await fetch('/api/db');
+      const currentData = await response.json();
+      
+      const updatedData = {
+        ...currentData,
+        sections: sectionsToSave
+      };
+      
+      const saveResponse = await fetch('/api/db', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData)
+      });
+      
+      if (saveResponse.ok) {
+        console.log('✅ Разделы сохранены на сервере');
+        return true;
+      } else {
+        console.error('❌ Ошибка сохранения разделов');
+        return false;
+      }
+    } catch (error) {
+      console.error('❌ Ошибка сохранения:', error);
+      return false;
+    }
+  };
+
   // ✅ 5. НОВАЯ функция сохранения по кнопке:
-  const saveChanges = () => {
+  const saveChanges = async () => {
+    // Сначала обновляем локальное состояние
     onSave(localSections);
     setHasChanges(false);
+    
+    // Затем отправляем на сервер
+    await saveToServer(localSections);
+  };
+
+  // ✅ Функция сброса
+  const handleReset = () => {
+    setLocalSections(defaultSections);
+    setSections(defaultSections);
+    setHasChanges(true); // Отметить изменения
   };
 
   const defaultSections: Section[] = [
@@ -91,7 +132,7 @@ export default function AdminSections({ sections: initialSections, onSave }: Adm
     <h3>🏗️ Порядок разделов главной страницы</h3>
     <div className={styles.headerActions}>
       <button 
-        onClick={() => onSave(defaultSections)}
+        onClick={handleReset}
         className={styles.resetBtn}
       >
         🔄 Сбросить

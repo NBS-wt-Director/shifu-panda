@@ -222,10 +222,128 @@
     100% { box-shadow: 0 0 0 0 rgba(6, 78, 59, 0); }
   }
   
-  /* RESPONSIVE */
-  @media (max-width: 1024px) {
-    .grid {
-      grid-template-columns: 1fr;
-    }
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr;
   }
+}
+
+/* AdminDividers styles */
+.description {
+  margin-bottom: 1.5rem;
+  color: rgb(107, 114, 128);
+  line-height: 1.6;
+}
+
+.emptyState {
+  padding: 2rem;
+  text-align: center;
+  background: rgba(243, 244, 246, 0.5);
+  border-radius: 1rem;
+  color: rgb(107, 114, 128);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgb(229, 231, 235);
+}
+
+.cardHeader h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: rgb(17, 24, 39);
+  border: none;
+  padding: 0;
+}
+
+.deleteBtn {
+  background: rgb(239, 68, 68);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+  background: rgb(220, 38, 38);
+  transform: translateY(-1px);
+}
+
+.fieldFull {
+  grid-column: 1 / -1;
+}
+
+.select {
+  padding: 0.875rem;
+  border: 2px solid rgb(229, 231, 235);
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
+  background: white;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-color: rgb(251, 191, 36);
+}
+
+.dividerPreview {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(229, 231, 235);
+}
+
+.arrow {
+  color: rgb(251, 191, 36);
+  font-size: 1.25rem;
+}
+
+.preview {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  text-align: center;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.previewContent {
+  font-weight: 600;
+}
+
+.addBtn {
+  background: linear-gradient(135deg, rgb(59, 130, 246), rgb(37, 99, 235));
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 1.5rem;
+  transition: all 0.3s;
+}
+
+.addBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+}
+
+.helperText {
+  color: rgb(107, 114, 128);
+  font-size: 0.8rem;
+}
   

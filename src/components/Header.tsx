@@ -144,6 +144,7 @@ openCallModal = () => {},
           <nav className={styles.desktopNav} ref={dropdownRef}>
             <ul className={styles.navList}>
               <li><Link href="/" className={styles.navLink}>Главная</Link></li>
+              <li><Link href="/schedule" className={styles.navLink}>Расписание</Link></li>
               <li><Link href="/lk" className={styles.navLink}>Личный кабинет </Link></li>
               <li className={styles.dropdown}>
                 <span className={styles.dropdownToggle} onClick={() => setIsProgramsOpen(!isProgramsOpen)}>
@@ -190,6 +191,7 @@ openCallModal = () => {},
 <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.mobileOpen : ''}`} ref={mobileRef}>
         <ul className={styles.mobileNavList}>
           <li><a href="/" className={styles.mobileNavLink}>Главная</a></li>
+          <li><a href="/schedule" className={styles.mobileNavLink}>Расписание</a></li>
           <li><a href="/trainers" className={styles.mobileNavLink}>Коллектив</a></li>
            <li><a href="/programs" className={styles.mobileNavLink}>Все программы</a></li> 
            <li><a href="/lk" className={styles.mobileNavLink}>Личный кабинет</a></li>

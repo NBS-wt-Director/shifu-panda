@@ -1,19 +1,20 @@
 'use client';
-import { useState } from 'react';
 import Link from 'next/link';
 import styles from './AdminHeader.module.css';
+
+interface AdminHeaderProps {
+  changesCount: number; 
+  onSave: () => void; 
+  dbData: any; 
+  onLogout: () => void;
+}
 
 export default function AdminHeader({ 
   changesCount, 
   onSave, 
   dbData,
   onLogout 
-}: { 
-  changesCount: number; 
-  onSave: () => void; 
-  dbData: any; 
-  onLogout: () => void;
-}) {
+}: AdminHeaderProps) {
   return (
     <header className={styles.header}>
       <div className={styles.left}>
@@ -32,7 +33,7 @@ export default function AdminHeader({
             )}
           </button>
         </div>
-        
+
         <div className={styles.stats}>
           <span>📊 {Object.keys(dbData || {}).length} разделов</span>
         </div>

@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, Mail, Bug, Copy, RefreshCw } from 'lucide-react';
 
 interface ErrorProps {
@@ -11,6 +12,23 @@ export default function Error({ error, reset }: ErrorProps) {
   const [errorSent, setErrorSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorInfo, setErrorInfo] = useState('');
+  const [countdown, setCountdown] = useState(15);
+  const router = useRouter();
+
+  // Обратный отсчёт и редирект
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          router.push('/');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [router]);
 
   useEffect(() => {
     // Автоматическая отправка отчета
@@ -93,6 +111,13 @@ export default function Error({ error, reset }: ErrorProps) {
               <p className="text-sm text-emerald-700 mt-2">Разработчики уже работают над проблемой!</p>
             </div>
           )}
+        </div>
+
+        {/* Обратный отсчёт */}
+        <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-6 text-center mb-8">
+          <p className="text-lg text-amber-800 mb-2">Автоматический переход на главную через:</p>
+          <div className="text-5xl font-black text-amber-600">{countdown}</div>
+          <p className="text-sm text-amber-700 mt-2">секунд</p>
         </div>
 
         {/* Действия */}

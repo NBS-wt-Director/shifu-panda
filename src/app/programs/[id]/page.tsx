@@ -1,9 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, X, CheckCircle, Loader2, Image as ImageIcon } from 'lucide-react';
-import Header from '@/components/Header';
+import SiteHeader from '@/components/ui/SiteHeader';
 import Footer from '@/components/Footer';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import CallModal from '@/components/ui/CallModal';
 
 interface Program {
   id: string;
@@ -11,6 +13,7 @@ interface Program {
   description: string;
   image: string;
   gallery?: string[];
+  photoAlbum?: Array<{ image: string; caption: string }>;
   trainers?: Array<{
     id: string;
     name: string;
@@ -22,17 +25,26 @@ interface Program {
     time: string;
     trainer: string;
     location: string;
+    params?: string[];
   }>;
 }
 
-export default function ProgramPage({ params }: { params: Promise<{ id: string }> }) { // ← params как Promise
+export default function ProgramPage({ params }: { params: Promise<{ id: string }> }) {
   const [program, setProgram] = useState<Program | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ name: '', phone: '', email: '', message: '' });
   const [formReason, setFormReason] = useState('');
-  const [siteSettings, setSiteSettings] = useState({ clientNotification: '' });
+  const [galleryIndex, setGalleryIndex] = useState(0);
+  const [showGalleryModal, setShowGalleryModal] = useState(false);
+  const [callModalOpen, setCallModalOpen] = useState(false);
+  const [callReason, setCallReason] = useState('Общий запрос');
+
+  const openCallModal = (reason: string) => {
+    setCallReason(reason);
+    setCallModalOpen(true);
+  };
 
   // ✅ ИСПРАВЛЕНО: await params
   useEffect(() => {
@@ -96,10 +108,10 @@ export default function ProgramPage({ params }: { params: Promise<{ id: string }
   }
 
   return (
-    // ... остальной JSX код БЕЗ ИЗМЕНЕНИЙ
     <div className="min-h-screen bg-gray-50">
-      <Header
-         pageTitle={program.name}
+      <SiteHeader
+        pageTitle={program.name}
+        onOpenCallModal={openCallModal}
       />
       
       <section className="pt-24 pb-20 bg-gradient-to-br from-yellow-50 to-orange-50">
@@ -111,15 +123,15 @@ export default function ProgramPage({ params }: { params: Promise<{ id: string }
           </div>
           
           <div className="max-w-4xl mx-auto">
-            <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden">
+            <div className="relative bg-white shadow-2xl">
               <img 
                 src={program.image} 
                 alt={program.name}
-                className="w-full h-96 md:h-[500px] object-cover"
+                className="w-full h-96 md:h-[500px] object-contain bg-gray-100"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
                   (e.target as HTMLImageElement).parentElement!.innerHTML = 
-                    '<div class="w-full h-96 md:h-[500px] bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center rounded-3xl"><ImageIcon className="w-24 h-24 text-gray-400 mx-auto" /></div>';
+                    '<div class="w-full h-96 md:h-[500px] bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center"><ImageIcon className="w-24 h-24 text-gray-400 mx-auto" /></div>';
                 }}
               />
             </div>
@@ -127,24 +139,140 @@ export default function ProgramPage({ params }: { params: Promise<{ id: string }
         </div>
       </section>
 
-      {/* Остальные секции без изменений */}
-      {program.gallery && program.gallery.length > 0 && (
+      {/* Секция тренеров */}
+      {program.trainers && program.trainers.length > 0 && (
+        <section className="py-24 bg-gradient-to-br from-blue-50 to-indigo-50">
+          <div className="max-w-6xl mx-auto px-4">
+            <h2 className="text-4xl md:text-5xl font-black text-center mb-16 bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent">
+              👨‍🏫 Тренеры программы
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {program.trainers.map((trainer: any, idx: number) => (
+                <Link 
+                  key={idx} 
+                  href={`/trainers/${trainer.id}`}
+                  className="block bg-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+                >
+                  <div className="relative h-64">
+                    <img 
+                      src={trainer.image} 
+                      alt={trainer.name}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{trainer.name}</h3>
+                    <p className="text-gray-600">{trainer.experience}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Секция расписания тренировок */}
+      {program.workouts && program.workouts.length > 0 && (
+        <section className="py-16 bg-white">
+          <div className="max-w-6xl mx-auto px-4">
+            <h2 className="text-3xl md:text-4xl font-black text-center mb-12 bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent">
+              📅 Расписание
+            </h2>
+            <div className="flex flex-wrap justify-center gap-4">
+              {program.workouts.map((workout: any, idx: number) => (
+                <div key={idx} className="flex items-center gap-3 bg-gradient-to-r from-emerald-500 to-green-500 px-6 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all text-white">
+                  <div className="bg-white/20 px-3 py-1 rounded-lg font-bold">
+                    {workout.day}
+                  </div>
+                  <div className="font-semibold text-lg">
+                    {workout.time}
+                  </div>
+                  {workout.params && workout.params.length > 0 && (
+                    <div className="flex gap-1">
+                      {workout.params.map((param: string, pIdx: number) => (
+                        <span key={pIdx} className="bg-white/20 px-2 py-1 rounded text-sm">
+                          {param}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Слайдер фотоальбома */}
+      {program.photoAlbum && program.photoAlbum.length > 0 && (
         <section className="py-24 bg-white">
           <div className="max-w-7xl mx-auto px-4">
             <h2 className="text-4xl md:text-5xl font-black text-center mb-20 bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent drop-shadow-2xl">
               📸 Фотогалерея
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {program.gallery.map((photo, idx) => (
-                <div key={idx} className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-2">
-                  <img 
-                    src={photo} 
-                    alt={`Фото ${idx + 1}`}
-                    className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all duration-500" />
+            
+            {/* Слайдер */}
+            <div className="relative">
+              {/* Главное изображение */}
+              <div className="relative aspect-video bg-gray-100 rounded-3xl overflow-hidden shadow-2xl">
+                <img 
+                  src={program.photoAlbum[galleryIndex]?.image} 
+                  alt={program.photoAlbum[galleryIndex]?.caption || `Фото ${galleryIndex + 1}`}
+                  className="w-full h-full object-contain"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect fill="%23f3f4f6" width="400" height="300"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%239ca3af" font-size="20">Фото не найдено</text></svg>';
+                  }}
+                />
+                
+                {/* Кнопка назад */}
+                {program.photoAlbum.length > 1 && (
+                  <button 
+                    onClick={() => setGalleryIndex(prev => prev === 0 ? program.photoAlbum.length - 1 : prev - 1)}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg transition-all hover:scale-110"
+                  >
+                    <ChevronLeft size={32} className="text-gray-800" />
+                  </button>
+                )}
+                
+                {/* Кнопка вперёд */}
+                {program.photoAlbum.length > 1 && (
+                  <button 
+                    onClick={() => setGalleryIndex(prev => prev === program.photoAlbum.length - 1 ? 0 : prev + 1)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg transition-all hover:scale-110"
+                  >
+                    <ChevronRight size={32} className="text-gray-800" />
+                  </button>
+                )}
+                
+                {/* Счётчик */}
+                <div className="absolute bottom-4 right-4 bg-black/70 text-white px-4 py-2 rounded-full font-semibold">
+                  {galleryIndex + 1} / {program.photoAlbum.length}
                 </div>
-              ))}
+              </div>
+              
+              {/* Миниатюры */}
+              {program.photoAlbum.length > 1 && (
+                <div className="flex gap-3 mt-6 overflow-x-auto pb-2 justify-center">
+                  {program.photoAlbum.map((photo: any, idx: number) => (
+                    <button 
+                      key={idx}
+                      onClick={() => setGalleryIndex(idx)}
+                      className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden shadow-lg transition-all hover:scale-105 ${
+                        idx === galleryIndex ? 'ring-4 ring-yellow-400 ring-offset-2' : 'opacity-60 hover:opacity-100'
+                      }`}
+                    >
+                      <img 
+                        src={photo.image} 
+                        alt={`Миниатюра ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23f3f4f6" width="100" height="100"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%239ca3af" font-size="10">?</text></svg>';
+                        }}
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -206,6 +334,12 @@ export default function ProgramPage({ params }: { params: Promise<{ id: string }
       )}
 
       <Footer />
+
+      <CallModal 
+        isOpen={callModalOpen}
+        onClose={() => setCallModalOpen(false)}
+        reason={callReason}
+      />
     </div>
   );
 }

@@ -1,6 +1,8 @@
 'use client';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import GridSettings from '@/components/ui/GridSettings';
 import styles from './HomePrograms.module.css';
 
 interface Program {
@@ -8,6 +10,7 @@ interface Program {
   image: string;
   name: string;
   description: string;
+  photoAlbum?: { image: string; caption?: string }[];
 }
 
 interface HomeProgramsProps {
@@ -21,10 +24,20 @@ export default function HomePrograms({
   openCallModal = () => {},
   openImageModal = () => {}
 }: HomeProgramsProps) {
+  const [gridCols, setGridCols] = useState(3);
   
   const safePrograms: Program[] = Array.isArray(programs) 
     ? programs.filter((p): p is Program => p && p.id && p.name && p.image)
     : [];
+
+  // Определяем класс сетки
+  const gridClass = {
+    1: 'grid-cols-1',
+    2: 'grid-cols-1 md:grid-cols-2',
+    3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+    4: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
+    5: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-5',
+  }[gridCols] || 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
 
   return (
     <section id="programs" className={styles.programs}>
@@ -35,41 +48,51 @@ export default function HomePrograms({
         
         {safePrograms.length > 0 ? (
           <>
+            {/* Настройки сетки */}
+            <GridSettings defaultCols={3} onChange={setGridCols} />
+            
             {/* ✅ ПЛИТКИ С КНОПКАМИ */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-              {safePrograms.map((program) => (
+            <div className={`grid ${gridClass} gap-6 mb-16`}>
+              {safePrograms.map((program) => {
+                const photoCount = program.photoAlbum?.length || 0;
+                return (
                 <div 
                   key={program.id} 
-                  className="group cursor-pointer hover:scale-[1.02] transition-all duration-300 bg-white rounded-2xl shadow-xl hover:shadow-2xl overflow-hidden"
+                  className="group cursor-pointer hover:translate-y-[-4px] transition-all duration-300 bg-white shadow-md hover:shadow-xl overflow-hidden border-2 border-gray-200 hover:border-emerald-500"
                 >
+                  {/* Отогнутый уголок - синий для программ */}
+                  <div className="absolute top-0 right-0 w-10 h-10 bg-gradient-to-bl from-transparent to-blue-500 z-10" />
+                  <div className="absolute top-0 right-0 w-14 h-14 bg-gradient-to-bl from-transparent to-blue-400 opacity-50 translate-x-2 -translate-y-2" />
+                  
                   {/* ✅ КАРТИНКА */}
                   <div 
-                    className="w-full h-80 bg-gradient-to-br from-gray-50 to-gray-100 rounded-t-2xl overflow-hidden relative"
+                    className="w-full h-48 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden relative"
                     onClick={() => openImageModal(program.image, program.name)}
                   >
+                    {photoCount > 0 && (
+                      <div className="absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-semibold z-5 flex items-center gap-1">
+                        📷 {photoCount}
+                      </div>
+                    )}
                     <Image
                       src={program.image}
                       alt={program.name}
                       width={400}
                       height={320}
-                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 hover:brightness-110"
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
                   
                   {/* ✅ КОНТЕНТ */}
-                  <div className="p-8 text-center">
-                    <h3 className="text-2xl font-black text-gray-900 mb-4 leading-tight">
+                  <div className="p-6 text-center">
+                    <h3 className="text-xl font-black text-gray-900 leading-tight">
                       {program.name}
                     </h3>
-                    <p className="text-gray-600 mb-8 leading-relaxed text-lg line-clamp-3">
-                      {program.description}
-                    </p>
                     
                     {/* ✅ ДВЕ КНОПКИ ПОД КАЖДОЙ ПЛИТКОЙ */}
-                    <div className="flex gap-4 justify-center">
+                    <div className="flex gap-3 justify-center">
                       <button 
-                        className="flex-1 px-6 py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 text-lg"
+                        className="flex-1 px-4 py-3 bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition-all duration-300 shadow-md hover:shadow-lg text-sm"
                         onClick={(e) => {
                           e.stopPropagation();
                           openCallModal(`Программа: ${program.name}`);
@@ -80,15 +103,15 @@ export default function HomePrograms({
                       
                       <Link 
                         href={`/programs/${program.id}`}
-                        className="px-6 py-4 bg-white text-emerald-600 font-bold rounded-xl border-2 border-emerald-600 hover:bg-emerald-600 hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 text-lg flex items-center justify-center gap-2"
+                        className="px-4 py-3 bg-white text-emerald-600 font-bold border-2 border-emerald-600 hover:bg-emerald-600 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg text-sm"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        Подробнее →
+                        Подробнее
                       </Link>
                     </div>
                   </div>
                 </div>
-              ))}
+              )})}
             </div>
 
             {/* ✅ КНОПКА "ВСЕ ПРОГРАММЫ" ПОД ПЛИТКАМИ */}

@@ -2,9 +2,10 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { X, CheckCircle, Loader2 } from 'lucide-react';
-import Header from '@/components/Header';
+import SiteHeader from '@/components/ui/SiteHeader';
 import Footer from '@/components/Footer';
-import FullScreenImageModal from '@/components/ui/FullScreenImageModal'; // ✅ МОДАЛКА
+import FullScreenImageModal from '@/components/ui/FullScreenImageModal';
+import CallModal from '@/components/ui/CallModal';
 import { notFound } from 'next/navigation';
 
 interface Trainer {
@@ -36,6 +37,13 @@ export default function TrainerPage({ params }: { params: Promise<{ id: string }
   
   // ✅ МОДАЛКА ФОТО
   const [imageModal, setImageModal] = useState({ open: false, url: '', alt: '' });
+  const [callModalOpen, setCallModalOpen] = useState(false);
+  const [callReason, setCallReason] = useState('Общий запрос');
+
+  const openCallModal = (reason: string) => {
+    setCallReason(reason);
+    setCallModalOpen(true);
+  };
 
   useEffect(() => {
     const loadTrainer = async () => {
@@ -99,9 +107,11 @@ export default function TrainerPage({ params }: { params: Promise<{ id: string }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* ✅ Header С ИМЕНЕМ ТРЕНЕРА */}
-      <Header pageTitle={trainer.name} />
-      
+      <SiteHeader 
+        pageTitle={trainer.name}
+        onOpenCallModal={openCallModal}
+      />
+
       {/* Основная информация */}
       <section className="pt-24 pb-20 bg-gradient-to-br from-yellow-50 to-orange-50">
         <div className="max-w-4xl mx-auto px-4">
@@ -299,6 +309,12 @@ export default function TrainerPage({ params }: { params: Promise<{ id: string }
         imageUrl={imageModal.url}
         alt={imageModal.alt}
         onClose={() => setImageModal({ open: false, url: '', alt: '' })}
+      />
+
+      <CallModal 
+        isOpen={callModalOpen}
+        onClose={() => setCallModalOpen(false)}
+        reason={callReason}
       />
 
       <Footer />

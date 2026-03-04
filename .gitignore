@@ -5,6 +5,7 @@ out/
 
 # Local data
 data/
+public/yandex-data/
 .env*
 .env.local
 .env.development.local

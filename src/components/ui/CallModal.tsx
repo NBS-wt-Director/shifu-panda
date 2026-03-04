@@ -42,6 +42,15 @@ export default function CallModal({ isOpen, onClose, reason }: CallModalProps) {
       });
 
       if (res.ok) {
+        // Отправляем статистику о форме
+        try {
+          await fetch('/api/admin/stats', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'form', formType: reason })
+          });
+        } catch (e) { /* ignore */ }
+        
         setSuccess(true);
         setTimeout(() => {
           onClose();

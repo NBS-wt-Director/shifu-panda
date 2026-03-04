@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import SectionSpacer from '@/components/ui/SectionSpacer';
-import HomeHeader from '@/components/home/HomeHeader';
+import SiteHeader from '@/components/ui/SiteHeader';
 import HomeSlider from '@/components/home/HomeSlider';
-import HomeSchedule from '@/components/home/HomeSchedule';
+import HomeSchedule from '@/components/home/HomeScheduleNew';
 import HomePrices from '@/components/home/HomePrices';
 import HomePrograms from '@/components/home/HomePrograms';
 import HomeTrainers from '@/components/home/HomeTrainers';
@@ -13,11 +13,48 @@ import HomeNews from '@/components/home/HomeNews';
 import HomeContacts from '@/components/home/HomeContacts';
 import GlobalPreloader from '@/components/ui/GlobalPreloader';
 import FullScreenImageModal from '@/components/ui/FullScreenImageModal';
-import CallModal from '@/components/ui/CallModal'; // ✅ НОВЫЙ
+import CallModal from '@/components/ui/CallModal';
+import StatsCollector from '@/components/ui/StatsCollector';
+
+interface Workout {
+  id?: number;
+  day: string;
+  time: string;
+  params?: string[];
+}
+
+interface Program {
+  id: number;
+  name: string;
+  image?: string;
+  workouts?: Workout[];
+}
+
+interface ScheduleImage {
+  id: number;
+  image?: string;
+}
+
+interface Section {
+  id: string;
+  title: string;
+  background: string;
+}
+
+type DbData = {
+  logo?: string;
+  sliders?: any[];
+  schedule?: ScheduleImage[];
+  programs?: Program[];
+  trainers?: any[];
+  news?: any[];
+  contacts?: any;
+  sections?: Section[];
+};
 
 export default function HomePage() {
-  const [displayData, setDisplayData] = useState({});
-  const [data, setData] = useState({});
+  const [displayData, setDisplayData] = useState<DbData>({});
+  const [data, setData] = useState<DbData>({});
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [modalImage, setModalImage] = useState({ open: false, url: '', alt: '' });
@@ -55,49 +92,181 @@ export default function HomePage() {
     setCallModalOpen(true);
   };
 
+  // ✅ Порядок секций из настроек (или默认值)
+  const defaultSections: Section[] = [
+    { id: "schedule", title: "Расписание занятий", background: "yellow-orange" },
+    { id: "prices", title: "Наши цены", background: "green-blue" },
+    { id: "programs", title: "Программы тренировок", background: "emerald-teal" },
+    { id: "trainers", title: "Наши тренеры", background: "gray-white" },
+    { id: "news", title: "Новости", background: "indigo-purple" }
+  ];
+
+  const sectionsOrder = data.sections || defaultSections;
+
+  // ✅ Получаем настройки глобального разделителя из БД
+  const globalDivider = data.globalDivider || {
+    enabled: true,
+    height: 'xxl',
+    background: 'gradientBlue',
+    textContent: '🏃 🏋️ 🧘 💪',
+    fontSize: 'large'
+  };
+
+  // Функция получения настроек разделителя между секциями (использует globalDivider)
+  const getDividerConfig = (sectionId: string, nextSectionId: string) => {
+    if (!globalDivider.enabled) return null;
+    return {
+      height: globalDivider.height || 'xxl',
+      background: globalDivider.background || 'gradientBlue',
+      textContent: globalDivider.textContent || '',
+      fontSize: globalDivider.fontSize || 'large'
+    };
+  };
+
+  // ✅ Компоненты секций
+  const renderSection = (sectionId: string, index: number) => {
+    const showSpacer = index > 0;
+    const nextSection = sectionsOrder[index + 1];
+    const dividerConfig = nextSection ? getDividerConfig(sectionId, nextSection.id) : null;
+    
+    switch (sectionId) {
+      case 'schedule':
+        return (
+          <>
+            {showSpacer && dividerConfig && (
+              <SectionSpacer 
+                height={dividerConfig.height}
+                background={dividerConfig.background}
+                textContent={dividerConfig.textContent}
+                fontSize={dividerConfig.fontSize}
+              />
+            )}
+            <section id="schedule">
+              <HomeSchedule openImageModal={openImageModal} programs={data.programs || []} scheduleImages={data.schedule || []} />
+            </section>
+          </>
+        );
+      case 'prices':
+        return (
+          <>
+            {showSpacer && dividerConfig && (
+              <SectionSpacer 
+                height={dividerConfig.height}
+                background={dividerConfig.background}
+                textContent={dividerConfig.textContent}
+                fontSize={dividerConfig.fontSize}
+              />
+            )}
+            <section id="prices">
+              <HomePrices openImageModal={openImageModal} />
+            </section>
+          </>
+        );
+      case 'programs':
+        return (
+          <>
+            {showSpacer && dividerConfig && (
+              <SectionSpacer 
+                height={dividerConfig.height}
+                background={dividerConfig.background}
+                textContent={dividerConfig.textContent}
+                fontSize={dividerConfig.fontSize}
+              />
+            )}
+            <section id="programs">
+              <HomePrograms 
+                programs={Array.isArray(data?.programs) ? data.programs : []}
+                openCallModal={openCallModal}
+                openImageModal={openImageModal}
+              />
+            </section>
+          </>
+        );
+      case 'trainers':
+        return (
+          <>
+            {showSpacer && dividerConfig && (
+              <SectionSpacer 
+                height={dividerConfig.height}
+                background={dividerConfig.background}
+                textContent={dividerConfig.textContent}
+                fontSize={dividerConfig.fontSize}
+              />
+            )}
+            <section id="trainers">
+              <HomeTrainers 
+                trainers={data.trainers || []} 
+                openCallModal={openCallModal}
+                openImageModal={openImageModal}
+              />
+            </section>
+          </>
+        );
+      case 'news':
+        return (
+          <>
+            {showSpacer && dividerConfig && (
+              <SectionSpacer 
+                height={dividerConfig.height}
+                background={dividerConfig.background}
+                textContent={dividerConfig.textContent}
+                fontSize={dividerConfig.fontSize}
+              />
+            )}
+            <HomeNews 
+              news={Array.isArray(data?.news) ? data.news : []}
+              openImageModal={openImageModal}
+            />
+          </>
+        );
+      default:
+        return null;
+    }
+  };
+
   if (loading) return <GlobalPreloader />;
 
   return (
     <>
+      <StatsCollector />
 
-
-<section id="news">
-
-</section>
-      {/* ✅ БЕЗ ОТСТУПОВ МЕЖДУ РАЗДЕЛАМИ */}
-      <HomeHeader 
-        displayData={displayData}
-        logo={data.logo}
-        openCallModal={openCallModal}
+      <SiteHeader 
+        pageTitle="Центр Функционального Развития «Шифу Панда»"
+        onOpenCallModal={openCallModal}
+        isHomePage={true}
       />
       
+      {/* ✅ Слайдер */}
       <HomeSlider sliders={data.sliders || []} />
       
-      <section id="schedule"><HomeSchedule openImageModal={openImageModal} /></section>
-           <SectionSpacer height="sm" background="gradientBlue" />
-      <section id="prices"><HomePrices openImageModal={openImageModal} /></section>
-           <SectionSpacer height="sm" background="gradientBlue" />
-           <section id="programs">
-  <HomePrograms 
-    programs={Array.isArray(data?.programs) ? data.programs : []}
-    openCallModal={openCallModal}
-    openImageModal={openImageModal}
-  />
-</section>
-           <SectionSpacer height="sm" background="gradientBlue" />
-      <section id="trainers"><HomeTrainers 
-        trainers={data.trainers || []} 
-        openCallModal={openCallModal}
-        openImageModal={openImageModal}
-      /></section>
-           <SectionSpacer height="sm" background="gradientBlue" />
-   <HomeNews 
-    news={Array.isArray(data?.news) ? data.news : []}
-    openImageModal={openImageModal}
-  />
-           <SectionSpacer height="sm" background="gradientBlue" />
-      <section id="contacts"><HomeContacts contacts={data.contacts || {}} /></section>
+      {/* ✅ Разделитель после слайдера (если есть секции и разделитель включен) */}
+      {sectionsOrder.length > 0 && globalDivider.enabled && (
+        <SectionSpacer 
+          height={globalDivider.height}
+          background={globalDivider.background}
+          textContent={globalDivider.textContent}
+          fontSize={globalDivider.fontSize}
+        />
+      )}
+      
+      {/* ✅ Рендерим секции в порядке из настроек */}
+      {sectionsOrder.map((section, index) => (
+        <div key={section.id}>
+          {renderSection(section.id, index)}
+        </div>
+      ))}
 
+      {/* ✅ Разделитель перед контактами */}
+      {globalDivider.enabled && (
+        <SectionSpacer 
+          height={globalDivider.height}
+          background={globalDivider.background}
+          textContent={globalDivider.textContent}
+          fontSize={globalDivider.fontSize}
+        />
+      )}
+      <section id="contacts"><HomeContacts contacts={data.contacts || {}} /></section>
+      
       {/* ✅ МОДАЛКИ */}
       <FullScreenImageModal 
         isOpen={modalImage.open}

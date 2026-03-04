@@ -2,10 +2,11 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Loader2, ImageIcon } from 'lucide-react';
-import Header from '@/components/Header';
+import SiteHeader from '@/components/ui/SiteHeader';
 import Footer from '@/components/Footer';
 import SectionSpacer from '@/components/ui/SectionSpacer';
-import FullScreenImageModal from '@/components/ui/CallModal'; // ✅ CallModal тоже!
+import FullScreenImageModal from '@/components/ui/FullScreenImageModal';
+import GridSettings from '@/components/ui/GridSettings';
 import styles from './page.module.css';
 import Image from 'next/image';
 import CallModal from "@/components/ui/CallModal";
@@ -16,6 +17,7 @@ interface Program {
   name: string;
   image: string;
   description?: string;
+  photoAlbum?: { image: string; caption?: string }[];
 }
 
 export default function ProgramsPage() {
@@ -26,6 +28,7 @@ export default function ProgramsPage() {
   const [modalImage, setModalImage] = useState({ open: false, url: '', alt: '' });
   const [callModalOpen, setCallModalOpen] = useState(false);  // ✅ CallModal состояние
   const [callReason, setCallReason] = useState('Общий запрос');
+  const [gridCols, setGridCols] = useState(3);
 
   // ✅ openCallModal ФУНКЦИЯ
   const openCallModal = (reason: string = 'Общий запрос') => {
@@ -74,16 +77,22 @@ export default function ProgramsPage() {
 
   const safePrograms = Array.isArray(programs) ? programs : [];
 
+  // Определяем класс сетки
+  const gridClass = {
+    1: 'grid-cols-1',
+    2: 'grid-cols-1 md:grid-cols-2',
+    3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+    4: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
+    5: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-5',
+  }[gridCols] || 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* ✅ Header С OpenCallModal */}
-      <Header 
+      <SiteHeader 
         pageTitle="Все программы тренировок"
-        openCallModal={openCallModal}  // ✅ ПЕРЕДАЁМ!
+        onOpenCallModal={openCallModal}
       />
 
-      {/* ✅ Заголовок */}
-      
       <SectionSpacer height="lg" background="default" />
 
       {/* ✅ ПЛИТКИ - ТОЧНАЯ КОпиЯ HomePrograms */}
@@ -91,8 +100,8 @@ export default function ProgramsPage() {
         <div className="max-w-6xl mx-auto px-4">
           {error || safePrograms.length === 0 ? (
             <div className="text-center py-20">
-              <div className="inline-block p-12 bg-gray-100 rounded-br-[1%] shadow-2xl">
-                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full flex items-center justify-center">
+              <div className="inline-block p-12 bg-gray-100 shadow-2xl">
+                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-emerald-400 to-green-500 flex items-center justify-center">
                   <span className="text-3xl font-bold text-white">🏋️</span>
                 </div>
                 <h3 className="text-2xl font-bold text-gray-700 mb-4">Программы скоро появятся</h3>
@@ -101,17 +110,31 @@ export default function ProgramsPage() {
             </div>
           ) : (
             <>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-                {safePrograms.map((program) => (
+              {/* Настройки сетки */}
+              <GridSettings defaultCols={3} onChange={setGridCols} />
+              
+              <div className={`grid ${gridClass} gap-6 mb-16`}>
+                {safePrograms.map((program) => {
+                  const photoCount = program.photoAlbum?.length || 0;
+                  return (
                   <div 
                     key={program.id} 
-                    className="group cursor-pointer hover:scale-[1.02] transition-all duration-300"
+                    className="group cursor-pointer hover:translate-y-[-4px] transition-all duration-300 bg-white shadow-md hover:shadow-xl overflow-hidden border-2 border-gray-200 hover:border-emerald-500"
                   >
+                    {/* Отогнутый уголок - синий для программ */}
+                    <div className="absolute top-0 right-0 w-10 h-10 bg-gradient-to-bl from-transparent to-blue-500 z-10" />
+                    <div className="absolute top-0 right-0 w-14 h-14 bg-gradient-to-bl from-transparent to-blue-400 opacity-50 translate-x-2 -translate-y-2" />
+                    
                     {/* ✅ КАРТИНКА - КЛИК = МОДАЛКА */}
                     <div 
-                      className="w-full h-80 bg-gray-100 rounded-br-[1%] overflow-hidden shadow-2xl group-hover:shadow-3xl transition-all duration-500 hover:-translate-y-2"
+                      className="w-full h-48 bg-gray-100 overflow-hidden shadow-md group-hover:shadow-xl transition-all duration-500"
                       onClick={() => openImageModal(program.image, program.name)}
                     >
+                      {photoCount > 0 && (
+                        <div className="absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-semibold z-5 flex items-center gap-1">
+                          📷 {photoCount}
+                        </div>
+                      )}
                       <Image
                         src={program.image}
                         alt={program.name}
@@ -122,14 +145,13 @@ export default function ProgramsPage() {
                     </div>
 
                     {/* ✅ КОНТЕНТ + КНОПКИ - ТОЧНАЯ КОпиЯ */}
-                    <div className="mt-6 text-center">
-                      <h3 className="text-2xl font-bold text-gray-900 mb-4">{program.name}</h3>
-                      <p className="text-gray-600 mb-6 leading-relaxed">{program.description}</p>
+                    <div className="p-6 text-center">
+                      <h3 className="text-xl font-bold text-gray-900">{program.name}</h3>
                       
                       {/* ✅ ДВЕ КНОПКИ - ТОЧНАЯ КОпиЯ HomePrograms */}
-                      <div className="flex gap-4 justify-center">
+                      <div className="flex gap-3 justify-center">
                         <button 
-                          className="px-8 py-3 bg-emerald-600 text-white font-semibold rounded-md hover:bg-emerald-700 transition-all shadow-md hover:shadow-lg whitespace-nowrap"
+                          className="px-6 py-2 bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-all shadow-md text-sm"
                           onClick={(e) => {
                             e.stopPropagation();
                             openCallModal(`Программа: ${program.name}`);  // ✅ РАБОТАЕТ!
@@ -140,15 +162,15 @@ export default function ProgramsPage() {
                         
                         <Link 
                           href={`/programs/${program.id}`}
-                          className="px-8 py-3 bg-white text-emerald-600 font-semibold rounded-md border-2 border-emerald-600 hover:bg-emerald-600 hover:text-white transition-all shadow-md hover:shadow-lg whitespace-nowrap"
+                          className="px-6 py-2 bg-white text-emerald-600 font-semibold border-2 border-emerald-600 hover:bg-emerald-600 hover:text-white transition-all shadow-md text-sm"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          Подробнее →
+                          Подробнее
                         </Link>
                       </div>
                     </div>
                   </div>
-                ))}
+                )})}
               </div>
 
               {/* ✅ КНОПКА "ВСЕ ПРОГРАММЫ" - ТОЧНАЯ КОпиЯ */}
