@@ -1,273 +1,191 @@
-# 🎯 Полный анализ проекта
+# 🎯 Полный анализ проекта "Шифу Панда"
 
-**Дата:** 17.02.2026, 06:24:01
+**Дата:** 17.03.2026
 
 **Статистика:**
 | Тип | Количество |
 |----|------------|
-| 📁 Все файлы | **206** |
-| 📄 Текстовые | **125** |
-| 🖼️ Медиа | **30** |
-| 📏 Строк кода | **13 141** |
-| 🎨 UI компонентов | **50** |
-| 🚨 Одиноких UI | **10** |
+| 📁 Все файлы | **250+** |
+| 📄 Текстовые | **150+** |
+| 🖼️ Медиа | **50+** |
+| 📏 Строк кода | **18 000+** |
+| 🎨 UI компонентов | **60+** |
 
-## ⚠️ Пропущенные файлы (1)
-
-```
-package-lock.json (289.1KB)
-```
+---
 
 ## 🗂️ Структура проекта
 
-```plaintext
-  ./
-    📄  deploy
-    📄 .env
-    📄 .gitignore
-    📄 add-path-comments.js
-    📄 db.json
-    📄 deploy
-    📄 docs
-    📄 next-env.d.ts
-    📄 next.config.js
-    📄 package-lock.json
-    📄 package.json
-    📄 postcss.config.mjs
-    📄 project-analysis.md
-    📄 public
-    📄 scripts
-    📄 src
-    📄 tailwind.config.ts
-    📄 tsconfig.json
-  deploy/
-    📄 deploy.sh
-    📄 ecosystem.config.js
-    📄 nginx.conf
-    📄 ssl-nginx.conf
-    📄 ssl-selfsigned.sh
-  public/
-    📄 favicon.ico
-    🖼️ logo.png
-    📄 uploads
-    🖼️ расписание1.jpg
-    🖼️ расписание2.jpg
-    🖼️ рассписание1.jpg
-    🖼️ рассписание2.jpg
-    🖼️ цены1.jpg
-    uploads/
-      🖼️ 1770799800687-qufrzrj5m.jpg
-      🖼️ 1770800269002-nu4enuosc.jpg
-      🖼️ 1770800420421-01mo77rht.jpg
-      🖼️ 1770874411760-zmkygx311.jpg
-      🖼️ 1770874476650-v8vpq8cm4.jpg
-      🖼️ 1770874691772-omjksnmt0.jpg
-      🖼️ 1770874980648-e0lk011br.jpg
-      🖼️ 1770875029241-2s5jrthj0.jpg
-      🖼️ 1770875064584-pg0kpxbs3.jpg
-      🖼️ 1770875124924-t83qrstxw.jpg
-      🖼️ 1770875159364-x3nekxoix.jpg
-      🖼️ 1770875619726-70ktf11oc.jpg
-      🖼️ 1770875655032-tisoj1mla.jpg
-      🖼️ 1770878875542-isxyrcrdp.jpg
-      🖼️ 1770878921390-ilzeg1rtt.jpg
-      🖼️ 1770878960202-dwe9x62n1.jpg
-      🖼️ 1770955215807-csc95dh2m.jpg
-      🖼️ 1770957514291-kpwafm733.jpg
-      🖼️ 1770958220930-5bk292aw9.jpg
-      🖼️ 1770958234580-2m6vh0jvt.jpg
-      🖼️ 1770958242861-adixw4ugp.jpg
-      🖼️ 1770958251891-l6l825d6z.jpg
-      🖼️ 1770958266447-90i59eqiu.jpg
-      🖼️ 1770965676341-gzhm9dddo.jpg
-  scripts/
-    📄 analyze.js
-  src/
-    📄 app
-    📄 components
-    📄 lib
-    📄 src
-    app/
-      📄 admin
-      📄 api
-      📄 error.tsx
-      📄 globals.css
-      📄 layout.tsx
-      📄 not-found.tsx
-      📄 page.tsx
-      📄 programs
-      📄 trainers
-      admin/
-        📄 page.module.css
-        📄 page.tsx
-      api/
-        📄 admin
-        📄 db
-        📄 employees
-        📄 error-report
-        📄 programs
-        📄 send-changes-notification
-        📄 send-email
-        📄 trainers
-        📄 upload
-        admin/
-          📄 news
-          📄 save-schedule
-          📄 trainers
-          news/
-            📄 [id]
-            📄 route.ts
-            [id]/
-              📄 route.ts
-          save-schedule/
-            📄 route.ts
-          trainers/
-            📄 [id]
-            📄 route.ts
-            [id]/
-              📄 route.ts
-        db/
-          📄 route.ts
-        employees/
-          📄 route.ts
-        error-report/
-          📄 route.ts
-        programs/
-          📄 [id]
-          📄 route.ts
-          [id]/
-            📄 route.ts
-        send-changes-notification/
-          📄 route.ts
-        send-email/
-          📄 route.ts
-        trainers/
-          📄 [id]
-          📄 route.ts
-          [id]/
-            📄 route.ts
-        upload/
-          📄 route.ts
-      programs/
-        📄 [id]
-        📄 page.module.css
-        📄 page.tsx
-        [id]/
-          📄 page.tsx
-      trainers/
-        📄 [id]
-        📄 page.tsx
-        [id]/
-          📄 page.tsx
-    components/
-      📄 Accordion.module.css css
-      📄 Footer.tsx
-      📄 Header.module.css
-      📄 Header.tsx
-      📄 Metadata.tsx
-      📄 admin
-      📄 home
-      📄 ui
-      admin/
-        📄 AdminContacts.module.css
-        📄 AdminContacts.tsx
-        📄 AdminHeader.module.css
-        📄 AdminHeader.tsx
-        📄 AdminItemForm.module.css
-        📄 AdminItemForm.tsx
-        📄 AdminItemList.module.css
-        📄 AdminItemList.tsx
-        📄 AdminNews.module.css
-        📄 AdminNews.tsx
-        📄 AdminPrograms.module.css
-        📄 AdminPrograms.tsx
-        📄 AdminSchedulePrices.module.css
-        📄 AdminSchedulePrices.tsx
-        📄 AdminSections.module.css
-        📄 AdminSections.tsx
-        📄 AdminSettings.module.css
-        📄 AdminSettings.tsx
-        📄 AdminSlider.module.css
-        📄 AdminSlider.tsx
-        📄 AdminSocialSettings.tsx
-        📄 AdminStaffPrograms.module.css
-        📄 AdminStaffPrograms.tsx
-        📄 AdminStorage.module.css
-        📄 AdminStorage.tsx
-        📄 AdminTabs.module.css
-        📄 AdminTabs.tsx
-        📄 AdminVisits.tsx
-        📄 AuthForm.tsx
-        📄 Header.tsx
-      home/
-        📄 HomeContacts.module.css
-        📄 HomeContacts.tsx
-        📄 HomeHeader.module.css
-        📄 HomeHeader.tsx
-        📄 HomeNews.module.css
-        📄 HomeNews.tsx
-        📄 HomePrices.module.css
-        📄 HomePrices.tsx
-        📄 HomePrograms.module.css
-        📄 HomePrograms.tsx
-        📄 HomeSchedule.module.css
-        📄 HomeSchedule.tsx
-        📄 HomeSlider.module.css
-        📄 HomeSlider.tsx
-        📄 HomeSocialButtons.module.css
-        📄 HomeSocialButtons.tsx
-        📄 HomeTrainers.module.css
-        📄 HomeTrainers.tsx
-      ui/
-        📄 Accordion.module.css
-        📄 Accordion.tsx
-        📄 ActionButtons.module.css
-        📄 ActionButtons.tsx
-        📄 CallForm.tsx
-        📄 CallModal.module.css
-        📄 CallModal.tsx
-        📄 ContactsSection.tsx
-        📄 DynamicMenu.module.css
-        📄 DynamicMenu.tsx
-        📄 FileInput.module.css
-        📄 FileInput.tsx
-        📄 FullScreenImageModal.module.css
-        📄 FullScreenImageModal.tsx
-        📄 GlobalPreloader.module.css
-        📄 GlobalPreloader.tsx
-        📄 HomeContactForm.module.css
-        📄 HomeContactForm.tsx
-        📄 NewsCard.module.css
-        📄 NewsCard.tsx
-        📄 NewsCarousel.tsx
-        📄 ProgramCard.module.css
-        📄 ProgramCard.tsx
-        📄 ScheduleSection.tsx
-        📄 SectionSpacer.module.css
-        📄 SectionSpacer.tsx
-        📄 Slider.tsx
-        📄 TrainerCard.tsx
-        📄 TrainersGrid.tsx
-        📄 TruncatedText.tsx
-        📄 button.tsx
-    lib/
-      📄 db.ts
-      📄 utils.ts
-    src/
-      📄 app
-      📄 components
-      app/
-        📄 api
-        api/
-          📄 admin
-          admin/
-            📄 save-prices
-            save-prices/
-              📄 route.ts
-      components/
-        📄 admin
-        admin/
-          📄 AdminNews.tsx
+```
+shifu-panda/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── page.tsx            # Главная страница
+│   │   ├── admin/              # Админ-панель
+│   │   ├── contacts/           # Страница контактов
+│   │   ├── programs/           # Программы (каталог + детали)
+│   │   ├── schedule/           # Расписание
+│   │   ├── trainers/           # Тренеры (каталог + детали)
+│   │   ├── lk/                 # Личный кабинет
+│   │   ├── error.tsx           # Страница ошибки
+│   │   ├── not-found.tsx       # Страница 404
+│   │   ├── layout.tsx          # Корневой layout
+│   │   ├── globals.css         # Глобальные стили
+│   │   └── api/                # API маршруты
+│   │       ├── db/             # Работа с БД
+│   │       ├── upload/         # Загрузка файлов
+│   │       ├── send-email/     # Отправка писем
+│   │       ├── error-report/   # Сообщения об ошибках
+│   │       ├── programs/       # API программ
+│   │       ├── trainers/       # API тренеров
+│   │       ├── employees/      # API сотрудников
+│   │       ├── workouts/       # API тренировок
+│   │       ├── autoupload/     # Автозагрузка
+│   │       └── admin/          # Админские функции
+│   │           ├── stats/      # Статистика
+│   │           ├── news/       # Новости
+│   │           ├── yandex-disk/# Яндекс.Диск
+│   │           └── ...
+│   ├── components/
+│   │   ├── ui/                 # Переиспользуемые UI компоненты
+│   │   ├── home/               # Компоненты главной страницы
+│   │   └── admin/              # Компоненты админ-панели
+├── public/
+│   └── uploads/                # Загруженные изображения
+├── db.json                     # База данных
+├── package.json                # Зависимости
+└── next.config.js              # Конфигурация Next.js
+```
+
+---
+
+## 🌐 Публичные страницы
+
+| Страница | URL | Описание |
+|----------|-----|----------|
+| Главная | `/` | Слайдер, секции с программами, тренерами, новостями |
+| Программы | `/programs` | Каталог программ тренировок |
+| Программа | `/programs/[id]` | Детали программы с фотоальбомом |
+| Тренеры | `/trainers` | Список тренеров и персонала |
+| Тренер | `/trainers/[id]` | Профиль тренера |
+| Расписание | `/schedule` | Расписание занятий |
+| Контакты | `/contacts` | Контакты, карта, соцсети |
+| Личный кабинет | `/lk` | Авторизация, абонементы |
+
+---
+
+## ⚙️ Админ-панель
+
+| Вкладка | Описание |
+|---------|----------|
+| Хедер | Настройка заголовка, анимаций, компонентов |
+| Слайдер | Управление слайдами главной |
+| Расписание и Цены | Загрузка изображений |
+| Тренировки | Управление тренировками |
+| Программы | CRUD программ тренировок |
+| Сотрудники | Тренеры и персонал |
+| Новости | Публикация новостей |
+| Контакты | Основные контакты |
+| Доп. контакты | Соцсети, Яндекс.Карта |
+| Разделы | Порядок секций на главной |
+| Разделители | Оформление разделителей |
+| Настройки | SMTP, логотип, favicon |
+| Статистика | Посещаемость |
+| Автозагрузка | Импорт с Яндекс.Диска |
+| Файлы | Управление файлами |
+
+---
+
+## 🧩 Компоненты
+
+### UI компоненты (30+)
+- `SiteHeader` - шапка с настраиваемыми компонентами
+- `Footer` - подвал
+- `ProgramCard`, `TrainerCard`, `NewsCard` - карточки
+- `Slider`, `NewsCarousel` - карусели
+- `CallModal`, `FullScreenImageModal` - модальные окна
+- `SectionSpacer`, `GridSettings` - настройки отображения
+- `StatsCollector` - сбор статистики
+- `FileInput` - загрузка файлов
+
+### Home компоненты (10+)
+- `HomeSlider`, `HomeSchedule`, `HomePrices`
+- `HomePrograms`, `HomeTrainers`, `HomeNews`, `HomeContacts`
+
+### Admin компоненты (25+)
+- `AdminHeader`, `AdminTabs` - навигация
+- `AdminSlider`, `AdminPrograms`, `AdminStaffPrograms` - управление контентом
+- `AdminSections`, `AdminDividers` - структура
+- `AdminSettings`, `AdminHeaderSettings` - настройки
+- `AdminStats`, `AutoUpload`, `AdminStorage` - инструменты
+
+---
+
+## 🔧 API Endpoints
+
+| Метод | Путь | Описание |
+|-------|------|----------|
+| GET/POST | `/api/db` | База данных |
+| GET/POST | `/api/programs` | Программы |
+| GET | `/api/programs/[id]` | Программа |
+| GET/POST | `/api/trainers` | Тренеры |
+| GET | `/api/trainers/[id]` | Тренер |
+| POST | `/api/upload` | Загрузка файла |
+| POST | `/api/send-email` | Отправить email |
+| GET/POST | `/api/admin/stats` | Статистика |
+| POST | `/api/autoupload` | Автозагрузка |
+
+---
+
+## 💾 Структура БД (db.json)
+
+```json
+{
+  "siteSettings": { "logo": "", "favicon": "", "autoupload": {}, "yandexClientId": "" },
+  "sliders": [{ "id": 1, "title": "", "image": "", "interval": 5, "position": "center" }],
+  "sliderSettings": { "textPositionMode": "static", "staticPosition": "bottom-right" },
+  "schedule": [], "prices": [],
+  "sections": [{ "id": "prices", "title": "Наши цены", "background": "indigo-purple", "cols": 1 }],
+  "globalDivider": { "enabled": true, "height": "md", "background": "gradientGreen", "textContent": "🏃", "fontSize": "small" },
+  "programs": [], "trainers": [], "staff": [], "news": [],
+  "contacts": { "address": "", "phone": "", "email": "", "vk": "", "telegram": "", "social": [] },
+  "additionalContacts": { "enabled": true, "title": "", "groups": [], "yandexMap": {} },
+  "headerSettings": { "titleSuffix": "", "componentsEnabled": {}, "componentsOrder": [], "homeMenuEnabled": true, "logoAnimation": "none", "secondLineText": "", "secondLineAnimation": "none" },
+  "emailConfig": { "smtpHost": "", "smtpPort": 465, "smtpSecure": true, "smtpUser": "", "smtpPass": "", "fromName": "", "adminEmail": "", "errorEmail": [] }
+}
+```
+
+---
+
+## ⚙️ Настройки хедера
+
+- **titleSuffix** - суффикс для `<title>`
+- **componentsEnabled** - вкл/выкл: callButton, pageTitle, menu
+- **componentsOrder** - порядок: logo, pageTitle, callButton, menu
+- **homeMenuEnabled** - меню разделов на главной
+- **logoAnimation** - анимация лого: none, pulse, bounce, rotate
+- **secondLineText** - текст второй строки
+- **secondLineAnimation** - анимация: none, fade, slide, typewriter
+
+---
+
+## 🚀 Запуск
+
+```bash
+npm install
+npm run dev     # http://localhost:3000
+npm run build   # Продакшен
+npm start
+```
+
+---
+
+## 📝 Технологии
+
+- **Frontend:** Next.js 14, React 18, TypeScript
+- **Стили:** Tailwind CSS + CSS Modules
+- **База данных:** JSON (LowDB)
+- **Облако:** Яндекс.Диск для автозагрузки
+- **Иконки:** Lucide React
 
 ```
 

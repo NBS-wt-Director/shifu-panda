@@ -1,49 +1,68 @@
-# Шифу Панда — Сайт спортивного центра
+# 🐼 Шифу Панда — Центр Функционального Развития
 
 Полнофункциональный веб-сайт спортивного центра с системой управления контентом (CMS).
 
 ## 🚀 Возможности
 
-- **Главная страница** — расписание, цены, программы, тренеры, новости, контакты
-- **Программы тренировок** — карточки с описанием, тренерами, расписанием и галереей
+### Публичные страницы
+- **Главная страница** — слайдер, расписание, цены, программы, тренеры, новости, контакты
+- **Программы тренировок** — каталог программ с детальными страницами
 - **Тренеры** — профили с опытом, специализацией и фотоальбомом
-- **Расписание** — два режима: картинка и интерактивная таблица
+- **Расписание** — отображение расписания занятий
+- **Контакты** — страница с контактами, картой и подписками на соцсети
+- **Личный кабинет** — для зарегистрированных пользователей
+
+### Админ-панель
+- **Хедер** — настройка заголовка, анимаций, компонентов
+- **Слайдер** — управление слайдами с настраиваемым положением текста
+- **Расписание и цены** — загрузка изображений
+- **Программы** — полное управление программами тренировок
+- **Сотрудники** — управление тренерами и персоналом
 - **Новости** — публикация событий центра
-- **Админ-панель** — управление всем контентом без кода
-- **Автозагрузка** — импорт программ и тренеров с Яндекс.Диска
+- **Контакты** — основные контакты центра
+- **Доп. контакты** — подписки на соцсети и Яндекс.Карта
+- **Разделы** — настройка секций главной страницы
+- **Разделители** — оформление разделителей между секциями
+- **Настройки** — SMTP, логотип, favicon
+- **Статистика** — посещаемость сайта
+- **Автозагрузка** — импорт контента с Яндекс.Диска
+- **Файлы** — управление загруженными файлами
 
 ## 🛠 Технологии
 
-- **Frontend:** Next.js 16, React, Tailwind CSS
+- **Frontend:** Next.js 14, React 18, TypeScript
+- **Стили:** Tailwind CSS + CSS Modules
 - **Backend:** Next.js API Routes
-- **База данных:** JSON-файл (db.json)
+- **База данных:** JSON-файл (db.json) через LowDB
 - **Изображения:** Локальная папка public/uploads
+- **Облако:** Яндекс.Диск для автозагрузки
 
 ## 📋 Структура проекта
 
 ```
 shifu-panda/
-├── public/
-│   ├── uploads/          # Загруженные изображения
-│   ├── yandex-data/      # Данные с Яндекс.Диска
-│   └── *.jpg             # Статические изображения
 ├── src/
-│   ├── app/
-│   │   ├── page.tsx              # Главная страница
-│   │   ├── schedule/             # Страница расписания
-│   │   ├── programs/[id]/        # Страница программы
-│   │   ├── trainers/[id]/        # Страница тренера
-│   │   ├── admin/                # Админ-панель
-│   │   └── api/                  # API endpoints
+│   ├── app/                    # Next.js App Router
+│   │   ├── page.tsx            # Главная страница
+│   │   ├── admin/              # Админ-панель
+│   │   ├── contacts/           # Страница контактов
+│   │   ├── programs/           # Программы (каталог + детали)
+│   │   ├── schedule/           # Расписание
+│   │   ├── trainers/           # Тренеры (каталог + детали)
+│   │   ├── lk/                 # Личный кабинет
+│   │   └── api/                # API маршруты
+│   │       ├── db/             # Работа с БД
+│   │       ├── upload/         # Загрузка файлов
+│   │       ├── send-email/     # Отправка писем
+│   │       └── admin/          # Админские функции
 │   ├── components/
-│   │   ├── home/                 # Компоненты главной
-│   │   ├── admin/                # Компоненты админки
-│   │   └── ui/                   # UI компоненты
-│   └── lib/
-│       ├── db.ts                 # Работа с БД
-│       └── programParser.ts      # Парсинг программ
-├── db.json                       # База данных
-└── package.json                  # Зависимости
+│   │   ├── ui/                 # Переиспользуемые компоненты
+│   │   ├── home/               # Компоненты главной страницы
+│   │   └── admin/              # Компоненты админ-панели
+├── public/
+│   └── uploads/                # Загруженные изображения
+├── db.json                     # База данных
+└── package.json
 ```
 
 ## 🚀 Запуск
@@ -70,60 +89,26 @@ npm start
 
 ```json
 {
-  "logo": "/path/to/logo.png",
-  "sliders": [
-    { "id": 1, "title": "Заголовок", "image": "/uploads/slider.jpg", "interval": 5 }
-  ],
-  "schedule": [
-    { "id": 1, "image": "/расписание1.jpg" }
-  ],
-  "prices": [
-    { "id": 1, "image": "/цены1.jpg" }
-  ],
-  "programs": [
-    {
-      "id": 1,
-      "name": "Название программы",
-      "description": "Описание",
-      "image": "/uploads/main.jpg",
-      "photoAlbum": [
-        { "image": "/uploads/photo1.jpg", "caption": "Фото 1" }
-      ],
-      "trainers": ["id тренера"],
-      "workouts": [
-        { "day": "Понедельник", "time": "10:00", "params": [] }
-      ]
-    }
-  ],
-  "trainers": [
-    {
-      "id": 1,
-      "name": "Имя тренера",
-      "image": "/uploads/trainer.jpg",
-      "experience": "Опыт",
-      "specialization": "Специализация",
-      "description": "Биография",
-      "photoAlbum": []
-    }
-  ],
-  "news": [
-    {
-      "id": 1,
-      "title": "Заголовок",
-      "text": "Текст",
-      "image": "/uploads/news.jpg"
-    }
-  ],
-  "contacts": {
-    "address": "Адрес",
-    "phone": "+7 (999) 000-00-00",
-    "email": "email@mail.ru",
-    "vk": "https://vk.com/...",
-    "telegram": "https://t.me/..."
-  },
+  "siteSettings": { "logo": "", "favicon": "", "autoupload": {}, "yandexClientId": "" },
+  "schedule": [{ "id": 1, "image": "/расписание1.jpg" }],
+  "prices": [{ "id": 1, "image": "/цены1.jpg" }],
   "sections": [
-    { "id": "schedule", "title": "Расписание", "background": "yellow-orange" }
-  ]
+    { "id": "prices", "title": "Наши цены", "background": "indigo-purple", "cols": 1 },
+    { "id": "schedule", "title": "Расписание занятий", "background": "yellow-orange", "cols": 4 },
+    { "id": "programs", "title": "Программы тренировок", "background": "blue-sky", "cols": 3 },
+    { "id": "trainers", "title": "Наши тренеры", "background": "red-pink", "cols": 3 },
+    { "id": "news", "title": "Новости центра", "background": "gray-white", "cols": 3 }
+  ],
+  "globalDivider": { "enabled": true, "height": "md", "background": "gradientGreen", "textContent": "🏃 🏋️ 🧘 💪", "fontSize": "small" },
+  "sliders": [{ "id": 1, "title": "Заголовок", "image": "/uploads/slider.jpg", "interval": 5, "position": "center" }],
+  "sliderSettings": { "textPositionMode": "static", "staticPosition": "bottom-right", "marginX": 10, "marginY": 10 },
+  "programs": [{ "id": 1, "name": "Название", "description": "...", "image": "/uploads/main.jpg", "photoAlbum": [], "trainers": [], "workouts": [] }],
+  "trainers": [{ "id": 1, "name": "Имя", "image": "/uploads/trainer.jpg", "experience": "Опыт", "specialization": "...", "description": "...", "photoAlbum": [] }],
+  "news": [{ "id": 1, "title": "Заголовок", "text": "Текст", "image": "/uploads/news.jpg" }],
+  "contacts": { "address": "...", "phone": "...", "email": "...", "vk": "...", "telegram": "...", "social": [] },
+  "additionalContacts": { "enabled": true, "title": "Подпишитесь на нас", "groups": [], "yandexMap": { "enabled": true, "center": [], "zoom": 15, "placemark": [], "address": "" } },
+  "headerSettings": { "titleSuffix": " | Шифу Панда", "componentsEnabled": { "callButton": true, "pageTitle": true, "menu": true }, "componentsOrder": [], "homeMenuEnabled": true, "logoAnimation": "none", "secondLineText": "", "secondLineAnimation": "none" },
+  "emailConfig": { "smtpHost": "", "smtpPort": 465, "smtpSecure": true, "smtpUser": "", "smtpPass": "", "fromName": "Шифу Панда", "adminEmail": "", "errorEmail": [] }
 }
 ```
 
@@ -131,19 +116,40 @@ npm start
 
 | Метод | Путь | Описание |
 |-------|------|----------|
-| GET | `/api/db` | Получить все данные |
-| POST | `/api/db` | Сохранить данные |
-| GET | `/api/programs/[id]` | Получить программу |
-| GET | `/api/trainers/[id]` | Получить тренера |
-| POST | `/api/admin/autoupload` | Автозагрузка с Яндекс.Диска |
+| GET/POST | `/api/db` | Получить/сохранить данные |
+| GET | `/api/programs` | Список программ |
+| GET | `/api/programs/[id]` | Программа по ID |
+| GET | `/api/trainers` | Список тренеров |
+| GET | `/api/trainers/[id]` | Тренер по ID |
+| POST | `/api/upload/` | Загрузка файла |
 | POST | `/api/send-email` | Отправить заявку |
+| POST | `/api/admin/autoupload` | Автозагрузка с Яндекс.Диска |
+| GET/POST | `/api/admin/stats` | Статистика |
+
+## ⚙️ Настройки слайдера
+
+Поддерживается 3 режима расположения текста:
+- **Статично** — текст в одном из 9 положений (углы, центр, между ними)
+- **По отдельности** — у каждого слайда своя позиция
+- **Случайно** — позиция меняется при каждом показе
+
+9 позиций: top-left, top-center, top-right, middle-left, middle-center, middle-right, bottom-left, bottom-center, bottom-right
+
+## ⚙️ Настройки хедера
+
+- Суффикс title (добавляется к заголовку страницы)
+- Включение/отключение компонентов (кнопка звонка, заголовок, меню)
+- Порядок компонентов
+- Включение меню разделов на главной
+- Анимация логотипа (none, pulse, bounce, rotate)
+- Вторая строка заголовка
+- Анимация второй строки (none, fade, slide, typewriter)
 
 ## 👥 Разработка
 
-- **Ветка по умолчанию:** main
 - **Стиль кода:** TypeScript + Tailwind CSS
-- **Форматирование:** автоматическое через ESLint
+- **Форматирование:** ESLint
 
 ## 📄 Лицензия
 
-Собственная разработка.
+© 2026 Шифу Панда. Екатеринбург. Все права защищены.

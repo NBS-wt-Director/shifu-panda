@@ -8,6 +8,7 @@ interface AdminTabsProps {
 
 export default function AdminTabs({ activeTab, onTabChange }: AdminTabsProps) {
   const tabs = [
+    { id: 'header', label: '⚙️ Хедер', countKey: 'header' },
     { id: 'sliders', label: '📸 Слайдер', countKey: 'sliders' },
     { id: 'schedulePrices', label: '📅💰 Расписание и Цены', countKey: 'schedulePrices' },
     { id: 'workouts', label: '📋 Тренировки', countKey: 'workouts' },
@@ -15,6 +16,7 @@ export default function AdminTabs({ activeTab, onTabChange }: AdminTabsProps) {
     { id: 'staff', label: '👨‍🏫 Сотрудники', countKey: 'staff' },
     { id: 'news', label: '📰 Новости', countKey: 'news' },
     { id: 'contacts', label: '📞 Контакты', countKey: 'contacts' },
+    { id: 'additionalContacts', label: '📱 Доп. контакты', countKey: 'additionalContacts' },
     { id: 'sections', label: '🏗️ Разделы', countKey: 'sections' }, 
     { id: 'dividers', label: '🎨 Разделители', countKey: 'dividers' },
     { id: 'settings', label: '⚙️ Настройки', countKey: 'settings' },

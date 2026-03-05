@@ -15,6 +15,8 @@ import AutoUpload from '@/components/admin/AutoUpload';
 import AdminStorage from '@/components/admin/AdminStorageNew';
 import AdminStatsContainer from '@/components/admin/AdminStatsContainer';
 import AdminDividers from '@/components/admin/AdminDividers';
+import AdminAdditionalContacts from '@/components/admin/AdminAdditionalContacts';
+import AdminHeaderSettings from '@/components/admin/AdminHeaderSettings';
 import styles from './page.module.css';
 
 export default function AdminPage() {
@@ -26,8 +28,8 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('sliders');
   const [editingItem, setEditingItem] = useState<any>(null);
   const [changesCount, setChangesCount] = useState(0);
-    const tabConfig = {
-
+    const     tabConfig = {
+    header: { component: 'header' },
     programs: { component: 'programs' },
     sliders: { component: 'slider' }, 
     schedulePrices: { component: 'schedulePrices' },
@@ -37,6 +39,7 @@ export default function AdminPage() {
    sections: { component: 'sections' },
     dividers: { component: 'dividers' },
     contacts: { component: 'contacts' },
+    additionalContacts: { component: 'additionalContacts' },
     settings: { component: 'settings' },
     stats: { component: 'stats' },
     autoupload: {  component: 'autoupload',},
@@ -201,7 +204,24 @@ const defaultSections = [
       <div className={styles.content}>
         <AdminTabs activeTab={activeTab} onTabChange={setActiveTab} />
         <div className={styles.mainGrid}>
-          {currentConfig.component === 'settings' ? (
+          {currentConfig.component === 'header' ? (
+  <AdminHeaderSettings 
+    settings={dbData.headerSettings || { 
+      titleSuffix: ' | Шифу Панда',
+      componentsEnabled: { callButton: true, pageTitle: true, menu: true },
+      componentsOrder: ['logo', 'callButton', 'pageTitle', 'menu'],
+      homeMenuEnabled: true,
+      logoAnimation: 'none',
+      secondLineText: '',
+      secondLineAnimation: 'none'
+    }}
+    onSave={(newSettings) => {
+      const newData = { ...dbData, headerSettings: newSettings };
+      setDbData(newData);
+      updateChangesCount(newData);
+    }}
+  />
+) : currentConfig.component === 'settings' ? (
   <AdminSettings 
     siteSettings={dbData.siteSettings || { logo: '', favicon: '' }}
     emailConfig={dbData.emailConfig || {}}
@@ -284,8 +304,14 @@ const defaultSections = [
 ) :currentConfig.component === 'slider' ? (
   <AdminSlider 
     sliders={dbData.sliders || []}
-    onSave={(newSliders) => {
-      const newData = { ...dbData, sliders: newSliders };
+    settings={dbData.sliderSettings || { textPositionMode: 'static', staticPosition: 'middle-center', marginX: 0, marginY: 0 }}
+    onSave={(newSliders, newInterval, newSettings) => {
+      const newData = { 
+        ...dbData, 
+        sliders: newSliders,
+        defaultInterval: newInterval,
+        sliderSettings: newSettings
+      };
       setDbData(newData);
       updateChangesCount(newData);
     }}
@@ -297,6 +323,26 @@ const defaultSections = [
       const newData = { ...dbData, contacts: newContacts };
       setDbData(newData);
       updateChangesCount(newData);
+    }}
+  />
+):currentConfig.component === 'additionalContacts' ? (
+  <AdminAdditionalContacts 
+    data={dbData.additionalContacts || { 
+      enabled: true, 
+      title: 'Подпишитесь на нас', 
+      groups: [], 
+      yandexMap: { 
+        enabled: true, 
+        center: [56.8355, 60.5972], 
+        zoom: 15, 
+        placemark: [56.8355, 60.5972], 
+        address: 'г. Екатеринбург, ул. 8 Марта, 70' 
+      } 
+    }}
+    onSave={(newData) => {
+      const updatedDbData = { ...dbData, additionalContacts: newData };
+      setDbData(updatedDbData);
+      updateChangesCount(updatedDbData);
     }}
   />
 ) // В рендере mainGrid добавьте:

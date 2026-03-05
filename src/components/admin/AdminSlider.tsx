@@ -3,33 +3,64 @@
 import { useState, useEffect, DragEvent } from 'react'
 import styles from './AdminSlider.module.css'
 
+type TextPositionMode = 'static' | 'individual' | 'random'
+type SliderPosition = 'top-left' | 'top-center' | 'top-right' | 'middle-left' | 'middle-center' | 'middle-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'
+
 interface SliderItem {
   id: number
   title?: string
-  subtitle?: string  // Новое поле!
+  subtitle?: string
   image: string
   interval?: number
   link?: string
+  position?: SliderPosition
+}
+
+interface SliderSettings {
+  textPositionMode: TextPositionMode
+  staticPosition: SliderPosition
+  marginX: number
+  marginY: number
 }
 
 interface AdminSliderProps {
   sliders: SliderItem[]
-  onSave: (sliders: SliderItem[], defaultInterval: number) => void
+  onSave: (sliders: SliderItem[], defaultInterval: number, settings?: SliderSettings) => void
+  settings?: SliderSettings
 }
 
-export default function AdminSlider({ sliders: initialSliders, onSave }: AdminSliderProps) {
+const POSITION_OPTIONS: { value: SliderPosition; label: string; gridArea: string }[] = [
+  { value: 'top-left', label: '↖', gridArea: '1 / 1' },
+  { value: 'top-center', label: '↑', gridArea: '1 / 2' },
+  { value: 'top-right', label: '↗', gridArea: '1 / 3' },
+  { value: 'middle-left', label: '←', gridArea: '2 / 1' },
+  { value: 'middle-center', label: '•', gridArea: '2 / 2' },
+  { value: 'middle-right', label: '→', gridArea: '2 / 3' },
+  { value: 'bottom-left', label: '↙', gridArea: '3 / 1' },
+  { value: 'bottom-center', label: '↓', gridArea: '3 / 2' },
+  { value: 'bottom-right', label: '↘', gridArea: '3 / 3' },
+]
+
+export default function AdminSlider({ sliders: initialSliders, onSave, settings: initialSettings }: AdminSliderProps) {
   const [localSliders, setLocalSliders] = useState<SliderItem[]>([])
   const [draggedItem, setDraggedItem] = useState<SliderItem | null>(null)
   const [newTitle, setNewTitle] = useState('')
-  const [newSubtitle, setNewSubtitle] = useState('')  // Новое поле
+  const [newSubtitle, setNewSubtitle] = useState('')
   const [newImage, setNewImage] = useState<File | null>(null)
   const [newImagePreview, setNewImagePreview] = useState('')
   const [newInterval, setNewInterval] = useState(5)
   const [newLink, setNewLink] = useState('')
+  const [newPosition, setNewPosition] = useState<SliderPosition>('middle-center')
   const [defaultInterval, setDefaultInterval] = useState(5)
   const [hasChanges, setHasChanges] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [showFormHelp, setShowFormHelp] = useState(false)
+
+  // Настройки позиционирования
+  const [textPositionMode, setTextPositionMode] = useState<TextPositionMode>(initialSettings?.textPositionMode || 'static')
+  const [staticPosition, setStaticPosition] = useState<SliderPosition>(initialSettings?.staticPosition || 'middle-center')
+  const [marginX, setMarginX] = useState(initialSettings?.marginX || 0)
+  const [marginY, setMarginY] = useState(initialSettings?.marginY || 0)
 
   const uploadImage = async (file: File): Promise<string> => {
     setUploading(true)
@@ -68,7 +99,8 @@ export default function AdminSlider({ sliders: initialSliders, onSave }: AdminSl
         subtitle: newSubtitle.trim() || undefined,
         image: uploadedImageUrl,
         interval: newInterval || undefined,
-        link: newLink.trim() || undefined
+        link: newLink.trim() || undefined,
+        position: textPositionMode === 'individual' ? newPosition : undefined
       }
       
       setLocalSliders([newSlider, ...localSliders])
@@ -86,12 +118,19 @@ export default function AdminSlider({ sliders: initialSliders, onSave }: AdminSl
     setNewImagePreview('')
     setNewInterval(5)
     setNewLink('')
+    setNewPosition('middle-center')
   }
 
   useEffect(() => {
     setLocalSliders(initialSliders)
     if (initialSliders[0]?.interval) setDefaultInterval(initialSliders[0].interval)
-  }, [initialSliders])
+    if (initialSettings) {
+      setTextPositionMode(initialSettings.textPositionMode)
+      setStaticPosition(initialSettings.staticPosition)
+      setMarginX(initialSettings.marginX)
+      setMarginY(initialSettings.marginY)
+    }
+  }, [initialSliders, initialSettings])
 
   // Drag & drop функции (без изменений)
   const handleDragStart = (e: DragEvent<HTMLDivElement>, item: SliderItem) => {
@@ -118,7 +157,7 @@ export default function AdminSlider({ sliders: initialSliders, onSave }: AdminSl
     setDraggedItem(null)
   }
 
-  const updateField = (id: number, field: keyof SliderItem, value: string | number) => {
+  const updateField = (id: number, field: keyof SliderItem, value: string | number | SliderPosition) => {
     const newSliders = localSliders.map(slider => 
       slider.id === id ? { ...slider, [field]: value || undefined } : slider
     )
@@ -133,7 +172,13 @@ export default function AdminSlider({ sliders: initialSliders, onSave }: AdminSl
   }
 
   const saveChanges = () => {
-    onSave(localSliders, defaultInterval)
+    const sliderSettings: SliderSettings = {
+      textPositionMode,
+      staticPosition,
+      marginX,
+      marginY
+    }
+    onSave(localSliders, defaultInterval, sliderSettings)
     setHasChanges(false)
   }
 
@@ -142,21 +187,98 @@ export default function AdminSlider({ sliders: initialSliders, onSave }: AdminSl
       {/* Глобальные настройки */}
       <div className={styles.globalSettings}>
         <h3>📱 Слайдер ({localSliders.length} слайдов)</h3>
-        <div className={styles.globalInterval}>
-          <label title="Интервал для слайдов без своего времени">
-            ⏱️ Интервал по умолчанию: 
-            <input
-              type="number"
-              min="1"
-              max="60"
-              value={defaultInterval}
-              onChange={e => {
-                setDefaultInterval(Number(e.target.value))
-                setHasChanges(true)
-              }}
-              className={styles.intervalInput}
-            /> сек
-          </label>
+        <div className={styles.globalSettingsGrid}>
+          <div className={styles.globalInterval}>
+            <label title="Интервал для слайдов без своего времени">
+              ⏱️ Интервал по умолчанию: 
+              <input
+                type="number"
+                min="1"
+                max="60"
+                value={defaultInterval}
+                onChange={e => {
+                  setDefaultInterval(Number(e.target.value))
+                  setHasChanges(true)
+                }}
+                className={styles.intervalInput}
+              /> сек
+            </label>
+          </div>
+
+          {/* Настройки позиционирования текста */}
+          <div className={styles.positionSettings}>
+            <label>📍 Режим расположения текста:</label>
+            <div className={styles.modeButtons}>
+              <button
+                type="button"
+                className={`${styles.modeBtn} ${textPositionMode === 'static' ? styles.modeBtnActive : ''}`}
+                onClick={() => { setTextPositionMode('static'); setHasChanges(true); }}
+              >
+                📌 Статично
+              </button>
+              <button
+                type="button"
+                className={`${styles.modeBtn} ${textPositionMode === 'individual' ? styles.modeBtnActive : ''}`}
+                onClick={() => { setTextPositionMode('individual'); setHasChanges(true); }}
+              >
+                👤 По отдельности
+              </button>
+              <button
+                type="button"
+                className={`${styles.modeBtn} ${textPositionMode === 'random' ? styles.modeBtnActive : ''}`}
+                onClick={() => { setTextPositionMode('random'); setHasChanges(true); }}
+              >
+                🎲 Случайно
+              </button>
+            </div>
+          </div>
+
+          {textPositionMode === 'static' && (
+            <div className={styles.staticPositionSettings}>
+              <label>📍 Позиция текста:</label>
+              <div className={styles.positionGrid}>
+                {POSITION_OPTIONS.map((pos) => (
+                  <button 
+                    key={pos.value}
+                    type="button"
+                    className={`${styles.positionBtn} ${staticPosition === pos.value ? styles.positionBtnActive : ''}`}
+                    onClick={() => { setStaticPosition(pos.value); setHasChanges(true); }}
+                    title={pos.label}
+                  >
+                    {pos.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className={styles.marginSettings}>
+            <label>📏 Отступы от края (пиксели):</label>
+            <div className={styles.marginInputs}>
+              <div className={styles.marginInput}>
+                <span>По горизонтали:</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="500"
+                  value={marginX}
+                  onChange={e => { setMarginX(Number(e.target.value)); setHasChanges(true); }}
+                  className={styles.intervalInput}
+                />
+              </div>
+              <div className={styles.marginInput}>
+                <span>По вертикали:</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="500"
+                  value={marginY}
+                  onChange={e => { setMarginY(Number(e.target.value)); setHasChanges(true); }}
+                  className={styles.intervalInput}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -234,6 +356,26 @@ export default function AdminSlider({ sliders: initialSliders, onSave }: AdminSl
             />
             {showFormHelp && <small>Ссылка при клике на заголовок (опционально)</small>}
           </div>
+
+          {textPositionMode === 'individual' && (
+            <div className={styles.formGroup}>
+              <label>📍 Позиция текста</label>
+              <div className={styles.positionGrid}>
+                {POSITION_OPTIONS.map((pos) => (
+                  <button 
+                    key={pos.value}
+                    type="button"
+                    className={`${styles.positionBtn} ${newPosition === pos.value ? styles.positionBtnActive : ''}`}
+                    onClick={() => setNewPosition(pos.value)}
+                    title={pos.label}
+                  >
+                    {pos.label}
+                  </button>
+                ))}
+              </div>
+              {showFormHelp && <small>Расположение текста на слайде</small>}
+            </div>
+          )}
         </div>
 
         <div className={styles.formActions}>
@@ -333,6 +475,20 @@ export default function AdminSlider({ sliders: initialSliders, onSave }: AdminSl
                     placeholder="Ссылка"
                     className={styles.inlineLink}
                   />
+                  {textPositionMode === 'individual' && (
+                    <select
+                      value={slider.position || 'middle-center'}
+                      onChange={e => updateField(slider.id, 'position', e.target.value as SliderPosition)}
+                      className={styles.inlinePosition}
+                      title="Позиция текста"
+                    >
+                      {POSITION_OPTIONS.map((pos) => (
+                        <option key={pos.value} value={pos.value}>
+                          {pos.label} {pos.value}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                   <button 
                     onClick={() => deleteSlider(slider.id)} 
                     className={styles.deleteBtn}

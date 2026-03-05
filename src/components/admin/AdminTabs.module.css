@@ -19,20 +19,21 @@
     height: auto;
     white-space: nowrap;
     transition: all 0.3s ease;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: rgb(55, 65, 81);
   }
   
-  .tabButton[data-state='open'] {
-    background: linear-gradient(to right, rgb(251, 191, 36), rgb(234, 179, 8));
-    color: rgb(17, 24, 39);
-    box-shadow: 0 10px 25px rgba(251, 191, 36, 0.3);
+  .tabButton:hover {
+    background: rgba(251, 191, 36, 0.1);
   }
   
-  /* Активная вкладка - подчёркивание */
+  /* Активная вкладка */
   .tabButton.active {
     background: linear-gradient(135deg, rgb(59, 130, 246) 0%, rgb(37, 99, 235) 100%);
     color: white;
     box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-    border-bottom: 3px solid rgb(251, 191, 36);
   }
   
   .tabButton.active .tabIcon,
@@ -42,5 +43,9 @@
   
   .tabIcon {
     font-size: 1.25rem;
+  }
+  
+  .tabLabel {
+    font-size: 0.9rem;
   }
   

@@ -17,6 +17,20 @@ interface SectionItem {
   title: string;
 }
 
+interface HeaderSettings {
+  titleSuffix: string
+  componentsEnabled: {
+    callButton: boolean
+    pageTitle: boolean
+    menu: boolean
+  }
+  componentsOrder: string[]
+  homeMenuEnabled: boolean
+  logoAnimation: string
+  secondLineText: string
+  secondLineAnimation: string
+}
+
 interface SiteHeaderProps {
   pageTitle?: string;
   onOpenCallModal?: (reason: string) => void;
@@ -38,6 +52,7 @@ export default function SiteHeader({
   const [trainersForMenu, setTrainersForMenu] = useState<MenuItem[]>([]);
   const [sections, setSections] = useState<SectionItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [headerSettings, setHeaderSettings] = useState<HeaderSettings | null>(null);
   
   const menuRef = useRef<HTMLDivElement>(null);
   const mobileRef = useRef<HTMLDivElement>(null);
@@ -50,7 +65,7 @@ export default function SiteHeader({
       .then(data => {
         setProgramsForMenu(
           Array.isArray(data.programs) 
-            ? data.programs.map((p: any) => ({ id: p.id, name: p.name, href: `/programs/${p.id}` }))
+            ? data.programs.map((p: any) => ({ id: p.id, name: p.name, href: `/?scrollTo=${p.id}` }))
             : []
         );
         setTrainersForMenu(
@@ -62,10 +77,22 @@ export default function SiteHeader({
         if (data.sections && Array.isArray(data.sections)) {
           setSections(data.sections.map((s: any) => ({ id: s.id, title: s.title })));
         }
+        // Загружаем настройки хедера
+        if (data.headerSettings) {
+          setHeaderSettings(data.headerSettings);
+        }
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
+
+  // Установка title
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const suffix = headerSettings?.titleSuffix || ' | Шифу Панда';
+      document.title = pageTitle + suffix;
+    }
+  }, [pageTitle, headerSettings]);
 
   // Закрытие меню при клике вне
   useEffect(() => {
@@ -109,7 +136,7 @@ export default function SiteHeader({
     { name: 'Расписание', href: '/schedule' },
     { name: 'Программы', href: '/programs' },
     { name: 'Тренеры', href: '/trainers' },
-    { name: 'Контакты', href: '/#contacts' },
+    { name: 'Контакты', href: '/contacts' },
     { name: 'Личный кабинет', href: '/lk' },
   ];
 
@@ -127,7 +154,7 @@ export default function SiteHeader({
             <Image 
               src='/logo.png'
               alt="Логотип" 
-              className={styles.logo}
+              className={`${styles.logo} ${headerSettings?.logoAnimation && headerSettings.logoAnimation !== 'none' ? styles[headerSettings.logoAnimation] : ''}`}
               width={48}
               height={48}
               priority
@@ -140,7 +167,7 @@ export default function SiteHeader({
               {sections.map((section) => (
                 <Link
                   key={section.id}
-                  href={`/#${section.id}`}
+                  href={`/?scrollTo=${section.id}`}
                   className={styles.homeMenuItem}
                   onClick={() => setHomeMenuOpen(false)}
                 >
@@ -162,7 +189,14 @@ export default function SiteHeader({
 
         {/* 3. ЗАГОЛОВОК СТРАНИЦЫ */}
         <div className={styles.titleSection}>
-          <h1 className={styles.pageTitle}>{pageTitle}</h1>
+          <h1 className={`${styles.pageTitle} ${headerSettings?.logoAnimation && headerSettings.logoAnimation !== 'none' ? styles[headerSettings.logoAnimation] : ''}`}>
+            {pageTitle}
+          </h1>
+          {headerSettings?.secondLineText && (
+            <div className={`${styles.secondLine} ${headerSettings?.secondLineAnimation && headerSettings.secondLineAnimation !== 'none' ? styles[headerSettings.secondLineAnimation] : ''}`}>
+              {headerSettings.secondLineText}
+            </div>
+          )}
         </div>
 
         {/* 4. КНОПКА МЕНЮ (десктоп) */}
@@ -189,7 +223,7 @@ export default function SiteHeader({
                     {sections.map((section) => (
                       <Link
                         key={section.id}
-                        href={`/#${section.id}`}
+                        href={`/?scrollTo=${section.id}`}
                         className={styles.submenuItem}
                         onClick={() => setDesktopMenuOpen(false)}
                       >

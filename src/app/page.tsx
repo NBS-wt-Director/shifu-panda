@@ -82,6 +82,27 @@ export default function HomePage() {
     }
   }, []);
 
+  // Обработка scrollTo параметра для навигации к разделам
+  useEffect(() => {
+    if (!loading && typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const scrollTo = params.get('scrollTo');
+      
+      if (scrollTo) {
+        // Убираем параметр из URL чтобы не скроллило при обновлении
+        window.history.replaceState({}, '', '/');
+        
+        // Скроллим к разделу
+        setTimeout(() => {
+          const element = document.getElementById(scrollTo);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 100);
+      }
+    }
+  }, [loading]);
+
   // ✅ ФУНКЦИИ ДЛЯ ВСЕХ КОМПОНЕНТОВ
   const openImageModal = (url: string, alt: string) => {
     setModalImage({ open: true, url, alt });
@@ -237,7 +258,10 @@ export default function HomePage() {
       />
       
       {/* ✅ Слайдер */}
-      <HomeSlider sliders={data.sliders || []} />
+      <HomeSlider 
+        sliders={data.sliders || []} 
+        settings={data.sliderSettings}
+      />
       
       {/* ✅ Разделитель после слайдера (если есть секции и разделитель включен) */}
       {sectionsOrder.length > 0 && globalDivider.enabled && (
