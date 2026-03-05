@@ -533,9 +533,13 @@ export async function POST(request: NextRequest) {
             const fileBuffer = await fileResponse.arrayBuffer();
             
             if (fileBuffer.byteLength > 0) {
+              // Формат: p_[id]_[m/номер]_[ddmmyyyyHHMMSS].jpeg
+              // ID программы будет известен позже, пока используем временный формат с именем папки
               const safeName = folder.name.replace(/[^a-zA-Z0-9а-яА-ЯёЁ]/g, '_');
-              const ext = (img.name.split('.').pop() || 'jpg').toLowerCase();
-              const localFileName = `${safeName}_${imgIdx}_${Date.now()}.${ext}`;
+              const timestamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14); // ddmmyyyyHHMMSS
+              const ext = 'jpeg'; // Всегда jpeg
+              // Временный формат until программа не создана в БД
+              const localFileName = `p_${safeName}_${imgIdx}_${timestamp}.${ext}`;
               const localPath = join(uploadsDir, localFileName);
               
               await writeFile(localPath, Buffer.from(fileBuffer));
@@ -544,7 +548,9 @@ export async function POST(request: NextRequest) {
                 name: img.name,
                 path: img.path,
                 localPath: `/uploads/${localFileName}`,
-                fileName: localFileName
+                fileName: localFileName,
+                timestamp,
+                isMain: imgIdx === 0 // Флаг главного фото
               });
               
               addLog(`   ✅ ${localFileName}`);

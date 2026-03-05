@@ -50,23 +50,13 @@ export default function HomeTrainers({
             
             <div className={`grid ${gridClass} gap-6 mb-12`}>
               {safeTrainers.map((trainer) => {
-                const photoCount = trainer.photoAlbum?.length || 0;
                 return (
                 <div key={trainer.id} className="text-center group">
-                  {/* Отогнутый уголок - красный для тренеров */}
                   <div className="relative bg-white shadow-md overflow-hidden border-2 border-gray-200 hover:border-red-500 transition-all hover:shadow-xl">
-                    <div className="absolute top-0 right-0 w-10 h-10 bg-gradient-to-bl from-transparent to-red-500 z-10" />
-                    <div className="absolute top-0 right-0 w-14 h-14 bg-gradient-to-bl from-transparent to-red-400 opacity-50 translate-x-2 -translate-y-2" />
-                    
                     <div 
                       className="w-full h-64 mx-auto bg-gray-100 overflow-hidden cursor-pointer relative"
                       onClick={() => openImageModal(trainer.image, trainer.name)}
                     >
-                      {photoCount > 0 && (
-                        <div className="absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-semibold z-5 flex items-center gap-1">
-                          📷 {photoCount}
-                        </div>
-                      )}
                       <Image 
                         src={trainer.image} 
                         alt={trainer.name} 

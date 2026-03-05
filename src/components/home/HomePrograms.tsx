@@ -54,26 +54,16 @@ export default function HomePrograms({
             {/* ✅ ПЛИТКИ С КНОПКАМИ */}
             <div className={`grid ${gridClass} gap-6 mb-16`}>
               {safePrograms.map((program) => {
-                const photoCount = program.photoAlbum?.length || 0;
                 return (
                 <div 
                   key={program.id} 
                   className="group cursor-pointer hover:translate-y-[-4px] transition-all duration-300 bg-white shadow-md hover:shadow-xl overflow-hidden border-2 border-gray-200 hover:border-emerald-500"
                 >
-                  {/* Отогнутый уголок - синий для программ */}
-                  <div className="absolute top-0 right-0 w-10 h-10 bg-gradient-to-bl from-transparent to-blue-500 z-10" />
-                  <div className="absolute top-0 right-0 w-14 h-14 bg-gradient-to-bl from-transparent to-blue-400 opacity-50 translate-x-2 -translate-y-2" />
-                  
                   {/* ✅ КАРТИНКА */}
                   <div 
                     className="w-full h-48 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden relative"
                     onClick={() => openImageModal(program.image, program.name)}
                   >
-                    {photoCount > 0 && (
-                      <div className="absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-semibold z-5 flex items-center gap-1">
-                        📷 {photoCount}
-                      </div>
-                    )}
                     <Image
                       src={program.image}
                       alt={program.name}

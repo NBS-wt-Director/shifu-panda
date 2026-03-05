@@ -15,20 +15,10 @@ interface Props {
 }
 
 export default function TrainerCard({ trainer }: Props) {
-  const photoCount = trainer.photoAlbum?.length || 0;
-  
   return (
     <div className={styles.card}>
-      {/* Отогнутый уголок - красный для тренеров */}
-      <div className={styles.cornerFold} />
-      
       {/* Изображение */}
       <div className={styles.imageWrapper}>
-        {photoCount > 0 && (
-          <div className={styles.photoCount}>
-            📷 {photoCount}
-          </div>
-        )}
         <Image
           src={trainer.image}
           alt={trainer.name}
