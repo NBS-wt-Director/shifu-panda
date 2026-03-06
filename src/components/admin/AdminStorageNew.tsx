@@ -75,7 +75,7 @@ export default function AdminStorage() {
   const exportDb = async () => {
     setExporting(true);
     try {
-      const res = await fetch('/api/admin/db?action=export');
+      const res = await fetch('/api/admin/db?action=export-data');
       const data = await res.json();
       
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
