@@ -25,7 +25,7 @@ const ScheduleSection: FC<ScheduleSectionProps> = ({ scheduleImages }) => {
         <div className="text-center mt-12">
           <Link 
             href="/schedule" 
-            className="inline-block px-8 py-4 bg-gradient-to-r from-emerald-600 to-green-500 text-white text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:from-emerald-700 hover:to-green-600 transition-all transform hover:scale-105"
+            className="inline-block px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:from-orange-600 hover:to-orange-700 transition-all transform hover:scale-105"
           >
             📅 Открыть полное расписание
           </Link>

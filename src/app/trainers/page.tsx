@@ -5,7 +5,6 @@ import { Loader2, Users, UserCog } from 'lucide-react';
 import SiteHeader from '@/components/ui/SiteHeader';
 import Footer from '@/components/Footer';
 import CallModal from '@/components/ui/CallModal';
-import GridSettings from '@/components/ui/GridSettings';
 
 interface Trainer {
   id: string;
@@ -102,7 +101,6 @@ export default function TrainersPage() {
           ) : (
             <>
               {/* Настройки сетки */}
-              <GridSettings defaultCols={3} onChange={setGridCols} />
               
               {/* Определяем класс сетки */}
               <div className={`grid ${

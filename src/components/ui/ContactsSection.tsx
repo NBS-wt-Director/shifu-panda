@@ -37,12 +37,12 @@ interface Contacts {
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="bg-white p-8 rounded-3xl shadow-2xl hover:shadow-3xl transition-all hover:-translate-y-2 border border-gray-100 group">
                   <div className="flex items-start space-x-4">
-                    <div className="w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                       <span className="text-2xl">📧</span>
                     </div>
                     <div>
                       <h4 className="text-xl font-bold text-gray-900 mb-1">Email</h4>
-                      <a href={`mailto:${contacts.email}`} className="text-xl text-gray-700 hover:text-emerald-600 transition-colors">
+                      <a href={`mailto:${contacts.email}`} className="text-xl text-gray-700 hover:text-blue-600 transition-colors">
                         {contacts.email}
                       </a>
                     </div>

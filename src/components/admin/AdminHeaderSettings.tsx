@@ -14,6 +14,7 @@ interface HeaderSettings {
   logoAnimation: string
   secondLineText: string
   secondLineAnimation: string
+  lkEnabled: boolean
 }
 
 interface AdminHeaderSettingsProps {
@@ -33,7 +34,8 @@ export default function AdminHeaderSettings({ settings: initialSettings, onSave 
     homeMenuEnabled: true,
     logoAnimation: 'none',
     secondLineText: '',
-    secondLineAnimation: 'none'
+    secondLineAnimation: 'none',
+    lkEnabled: true
   })
   const [hasChanges, setHasChanges] = useState(false)
 
@@ -186,6 +188,25 @@ export default function AdminHeaderSettings({ settings: initialSettings, onSave 
             />
             <span>Включить меню разделов на главной странице</span>
           </label>
+        </div>
+      </div>
+
+      {/* Личный кабинет */}
+      <div className={styles.section}>
+        <h4>🔐 Личный кабинет</h4>
+        
+        <div className={styles.formGroup}>
+          <label className={styles.checkbox}>
+            <input
+              type="checkbox"
+              checked={localSettings.lkEnabled}
+              onChange={e => updateField('lkEnabled', e.target.checked)}
+            />
+            <span>Показывать пункт "Личный кабинет" в меню</span>
+          </label>
+          <p className={styles.hint}>
+            Если выключено, страница личного кабинета будет недоступна через меню (но доступна по прямой ссылке)
+          </p>
         </div>
       </div>
 

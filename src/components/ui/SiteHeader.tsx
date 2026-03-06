@@ -29,6 +29,7 @@ interface HeaderSettings {
   logoAnimation: string
   secondLineText: string
   secondLineAnimation: string
+  lkEnabled: boolean
 }
 
 interface SiteHeaderProps {
@@ -131,13 +132,26 @@ export default function SiteHeader({
     }
   };
 
+  // Функция скролла к разделу
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      // Если элемент не найден (возможно, мы не на главной), переходим на главную с параметром
+      window.location.href = `/?scrollTo=${sectionId}`;
+    }
+    setHomeMenuOpen(false);
+    setDesktopMenuOpen(false);
+  };
+
   // Базовые пункты меню
   const baseMenuItems = [
     { name: 'Расписание', href: '/schedule' },
     { name: 'Программы', href: '/programs' },
     { name: 'Тренеры', href: '/trainers' },
     { name: 'Контакты', href: '/contacts' },
-    { name: 'Личный кабинет', href: '/lk' },
+    ...(headerSettings?.lkEnabled !== false ? [{ name: 'Личный кабинет', href: '/lk' }] : []),
   ];
 
   return (
@@ -165,14 +179,13 @@ export default function SiteHeader({
           {isHomePage && homeMenuOpen && sections.length > 0 && (
             <div className={styles.homeMenu}>
               {sections.map((section) => (
-                <Link
+                <button 
                   key={section.id}
-                  href={`/?scrollTo=${section.id}`}
                   className={styles.homeMenuItem}
-                  onClick={() => setHomeMenuOpen(false)}
+                  onClick={() => scrollToSection(section.id)}
                 >
                   {section.title}
-                </Link>
+                </button>
               ))}
             </div>
           )}
@@ -221,14 +234,13 @@ export default function SiteHeader({
                 {sections.length > 0 && (
                   <div className={styles.submenu}>
                     {sections.map((section) => (
-                      <Link
+                      <button
                         key={section.id}
-                        href={`/?scrollTo=${section.id}`}
                         className={styles.submenuItem}
-                        onClick={() => setDesktopMenuOpen(false)}
+                        onClick={() => scrollToSection(section.id)}
                       >
                         → {section.title}
-                      </Link>
+                      </button>
                     ))}
                   </div>
                 )}

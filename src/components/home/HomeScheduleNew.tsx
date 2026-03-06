@@ -113,7 +113,7 @@ export default function HomeSchedule({
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
             >
-              📋 Интерактивно
+              📅 Таблица
             </button>
           </div>
         </div>
@@ -167,7 +167,7 @@ export default function HomeSchedule({
                                 🕐 {workout.time}
                               </div>
                               {workout.programName && (
-                                <div className="text-sm text-emerald-600 font-medium">
+                                <div className="text-sm text-orange-600 font-medium">
                                   {workout.programName}
                                 </div>
                               )}

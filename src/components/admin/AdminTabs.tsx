@@ -10,10 +10,16 @@ export default function AdminTabs({ activeTab, onTabChange }: AdminTabsProps) {
   const tabs = [
     { id: 'header', label: '⚙️ Хедер', countKey: 'header' },
     { id: 'sliders', label: '📸 Слайдер', countKey: 'sliders' },
+    { id: 'homeContainer', label: '🏠 Главная', countKey: 'homeContainer' },
+    { id: 'homePrograms', label: '🏠 Программы', countKey: 'homePrograms' },
+    { id: 'homeTrainers', label: '🏠 Тренеры', countKey: 'homeTrainers' },
     { id: 'schedulePrices', label: '📅💰 Расписание и Цены', countKey: 'schedulePrices' },
     { id: 'workouts', label: '📋 Тренировки', countKey: 'workouts' },
     { id: 'programs', label: '🎯 Программы', countKey: 'programs' },
+    { id: 'programsCards', label: '🎯 Карточки', countKey: 'programsCards' },
     { id: 'staff', label: '👨‍🏫 Сотрудники', countKey: 'staff' },
+    { id: 'trainers', label: '👨‍🏫 Тренеры', countKey: 'trainers' },
+    { id: 'trainersCards', label: '👨‍🏫 Карточки', countKey: 'trainersCards' },
     { id: 'news', label: '📰 Новости', countKey: 'news' },
     { id: 'contacts', label: '📞 Контакты', countKey: 'contacts' },
     { id: 'additionalContacts', label: '📱 Доп. контакты', countKey: 'additionalContacts' },
@@ -22,7 +28,8 @@ export default function AdminTabs({ activeTab, onTabChange }: AdminTabsProps) {
     { id: 'settings', label: '⚙️ Настройки', countKey: 'settings' },
     { id: 'stats', label: '📊 Статистика', countKey: 'stats' },
     { id: 'autoupload', label: '☁️ Автозагрузка', countKey: 'autoupload'},
-    { id: 'files', label: '📁 Файлы и память', countKey: 'files'}
+    { id: 'files', label: '📁 Файлы и память', countKey: 'files'},
+    { id: 'design', label: '🎨 Дизайн', countKey: 'design'}
   ];
 
   return (

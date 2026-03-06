@@ -6,7 +6,6 @@ import SiteHeader from '@/components/ui/SiteHeader';
 import Footer from '@/components/Footer';
 import SectionSpacer from '@/components/ui/SectionSpacer';
 import FullScreenImageModal from '@/components/ui/FullScreenImageModal';
-import GridSettings from '@/components/ui/GridSettings';
 import styles from './page.module.css';
 import Image from 'next/image';
 import CallModal from "@/components/ui/CallModal";
@@ -66,7 +65,7 @@ export default function ProgramsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-400 to-green-500">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-400 to-blue-600">
         <div className="text-center text-white">
           <Loader2 className="w-16 h-16 animate-spin mx-auto mb-8" />
           <p className="text-2xl font-bold">Загрузка...</p>
@@ -101,7 +100,7 @@ export default function ProgramsPage() {
           {error || safePrograms.length === 0 ? (
             <div className="text-center py-20">
               <div className="inline-block p-12 bg-gray-100 shadow-2xl">
-                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-emerald-400 to-green-500 flex items-center justify-center">
+                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center">
                   <span className="text-3xl font-bold text-white">🏋️</span>
                 </div>
                 <h3 className="text-2xl font-bold text-gray-700 mb-4">Программы скоро появятся</h3>
@@ -111,14 +110,14 @@ export default function ProgramsPage() {
           ) : (
             <>
               {/* Настройки сетки */}
-              <GridSettings defaultCols={3} onChange={setGridCols} />
+              
               
               <div className={`grid ${gridClass} gap-6 mb-16`}>
                 {safePrograms.map((program) => {
                   return (
                   <div 
                     key={program.id} 
-                    className="group cursor-pointer hover:translate-y-[-4px] transition-all duration-300 bg-white shadow-md hover:shadow-xl overflow-hidden border-2 border-gray-200 hover:border-emerald-500"
+                    className="group cursor-pointer hover:translate-y-[-4px] transition-all duration-300 bg-white shadow-md hover:shadow-xl overflow-hidden border-2 border-gray-200 hover:border-blue-500"
                   >
                     {/* ✅ КАРТИНКА - КЛИК = МОДАЛКА */}
                     <div 
@@ -141,7 +140,7 @@ export default function ProgramsPage() {
                       {/* ✅ ДВЕ КНОПКИ - ТОЧНАЯ КОпиЯ HomePrograms */}
                       <div className="flex gap-3 justify-center">
                         <button 
-                          className="px-6 py-2 bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-all shadow-md text-sm"
+                          className="px-6 py-2 bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-all shadow-md text-sm"
                           onClick={(e) => {
                             e.stopPropagation();
                             openCallModal(`Программа: ${program.name}`);  // ✅ РАБОТАЕТ!
@@ -152,7 +151,7 @@ export default function ProgramsPage() {
                         
                         <Link 
                           href={`/programs/${program.id}`}
-                          className="px-6 py-2 bg-white text-emerald-600 font-semibold border-2 border-emerald-600 hover:bg-emerald-600 hover:text-white transition-all shadow-md text-sm"
+                          className="px-6 py-2 bg-white text-blue-600 font-semibold border-2 border-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-md text-sm"
                           onClick={(e) => e.stopPropagation()}
                         >
                           Подробнее
@@ -167,7 +166,7 @@ export default function ProgramsPage() {
               <div className="text-center">
                 <Link 
                   href="/"
-                  className="inline-flex items-center gap-3 px-12 py-6 bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-600 text-white font-black rounded-3xl shadow-2xl hover:shadow-3xl hover:-translate-y-3 transition-all duration-500 text-xl backdrop-blur-xl border border-emerald-400/30 hover:from-emerald-700 hover:to-green-700 group"
+                  className="inline-flex items-center gap-3 px-12 py-6 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-700 text-white font-black rounded-3xl shadow-2xl hover:shadow-3xl hover:-translate-y-3 transition-all duration-500 text-xl backdrop-blur-xl border border-blue-400/30 hover:from-blue-700 hover:to-blue-800 group"
                 >
                   <span>🏠 На главную</span>
                   <svg className="w-6 h-6 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">

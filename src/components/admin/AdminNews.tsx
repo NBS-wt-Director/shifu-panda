@@ -7,6 +7,8 @@ interface NewsItem {
   image: string;
   title: string;
   text: string;
+  videoUrl?: string;
+  mediaType?: 'image' | 'video';
 }
 
 interface AdminNewsProps {
@@ -27,6 +29,12 @@ export default function AdminNews({ news: initialNews = [], onSave }: AdminNewsP
   const [editingImagePreview, setEditingImagePreview] = useState('');
   const [hasChanges, setHasChanges] = useState(false);
 
+  // Новые поля для видео и ссылок VK
+  const [newMediaType, setNewMediaType] = useState<'file' | 'vk'>('file');
+  const [newVkLink, setNewVkLink] = useState('');
+  const [editingMediaType, setEditingMediaType] = useState<'file' | 'vk'>('file');
+  const [editingVkLink, setEditingVkLink] = useState('');
+
   useEffect(() => {
     const safeNews = (initialNews || []).map((item: any) => ({
       ...item,
@@ -38,13 +46,43 @@ export default function AdminNews({ news: initialNews = [], onSave }: AdminNewsP
 
 
   const addNews = () => {
-    if (!newImage || !newNews.title.trim() || !newNews.text.trim()) return;
+    if (!newNews.title.trim() || !newNews.text.trim()) return;
+    
+    // Проверяем, что есть либо файл, либо ссылка VK
+    if (newMediaType === 'file' && !newImage) return;
+    if (newMediaType === 'vk' && !newVkLink.trim()) return;
+    
+    let imageUrl = '';
+    let videoUrl = '';
+    let mediaType: 'image' | 'video' = 'image';
+    
+    if (newMediaType === 'file') {
+      imageUrl = URL.createObjectURL(newImage!);
+      // Определяем тип медиа по расширению файла
+      const fileType = newImage!.type;
+      if (fileType.startsWith('video/')) {
+        mediaType = 'video';
+        videoUrl = imageUrl;
+        imageUrl = '';
+      }
+    } else {
+      // Ссылка из VK
+      imageUrl = newVkLink;
+      // Если это ссылка на видео VK
+      if (newVkLink.includes('vk.com/video')) {
+        mediaType = 'video';
+        videoUrl = newVkLink;
+        imageUrl = '';
+      }
+    }
     
     const newsItem: NewsItem = {
       id: Date.now(),
-      image: URL.createObjectURL(newImage),
+      image: imageUrl,
       title: newNews.title,
-      text: newNews.text
+      text: newNews.text,
+      videoUrl: videoUrl || undefined,
+      mediaType
     };
     
     const newNewsList = [newsItem, ...localNews];
@@ -73,6 +111,8 @@ export default function AdminNews({ news: initialNews = [], onSave }: AdminNewsP
     setNewNews({ title: '', text: '' });
     setNewImage(null);
     setNewImagePreview('');
+    setNewMediaType('file');
+    setNewVkLink('');
   };
 
   const saveChanges = () => {
@@ -115,26 +155,67 @@ export default function AdminNews({ news: initialNews = [], onSave }: AdminNewsP
               />
             </div>
             <div className={styles.field}>
-              <label>Главное изображение</label>
-              <div className={styles.imagePreview}>
-                {newImagePreview && (
-                  <img src={newImagePreview} alt="Preview" className={styles.previewImg} />
-                )}
+              <label>Медиафайл</label>
+              <div className={styles.mediaTypeToggle}>
+                <button
+                  type="button"
+                  className={`${styles.toggleBtn} ${newMediaType === 'file' ? styles.toggleBtnActive : ''}`}
+                  onClick={() => setNewMediaType('file')}
+                >
+                  📁 Файл
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.toggleBtn} ${newMediaType === 'vk' ? styles.toggleBtnActive : ''}`}
+                  onClick={() => setNewMediaType('vk')}
+                >
+                  🔗 VK
+                </button>
               </div>
-<FileInput
-  accept="image/*"
-  onChange={(file, preview) => {
-    setNewImage(file);
-    setNewImagePreview(preview);
-  }}
-  preview={newImagePreview}
-  label="Главное изображение"
-/>
+              
+              {newMediaType === 'file' ? (
+                <>
+                  <div className={styles.imagePreview}>
+                    {newImagePreview && (
+                      <img src={newImagePreview} alt="Preview" className={styles.previewImg} />
+                    )}
+                  </div>
+                  <FileInput
+                    accept="image/*,video/*"
+                    onChange={(file, preview) => {
+                      setNewImage(file);
+                      setNewImagePreview(preview);
+                    }}
+                    preview={newImagePreview}
+                    label="Фото или видео"
+                  />
+                </>
+              ) : (
+                <div className={styles.vkLinkField}>
+                  <input
+                    type="url"
+                    value={newVkLink}
+                    onChange={(e) => setNewVkLink(e.target.value)}
+                    className={styles.input}
+                    placeholder="Ссылка на фото или видео из VK"
+                  />
+                  {newVkLink && (
+                    <div className={styles.vkPreview}>
+                      <img src={newVkLink} alt="VK Preview" className={styles.previewImg} />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             <button 
               className={styles.addBtn}
               onClick={addNews}
-              disabled={!newImage || !newNews.title.trim() || !newNews.text.trim()}
+              disabled={
+                (newMediaType === 'file' && !newImage) || 
+                (newMediaType === 'vk' && !newVkLink.trim()) ||
+                !newNews.title.trim() || 
+                !newNews.text.trim()
+              }
             >
               ➕ Опубликовать новость
             </button>
@@ -173,24 +254,89 @@ export default function AdminNews({ news: initialNews = [], onSave }: AdminNewsP
                     />
                   </div>
                   <div className={styles.field}>
-                    <label>Изображение</label>
-                    <div className={styles.imagePreview}>
-                      <img 
-                        src={editingImagePreview || editingNews.image} 
-                        alt="Preview" 
-                        className={styles.previewImg}
-                      />
+                    <label>Медиафайл</label>
+                    <div className={styles.mediaTypeToggle}>
+                      <button
+                        type="button"
+                        className={`${styles.toggleBtn} ${editingMediaType === 'file' ? styles.toggleBtnActive : ''}`}
+                        onClick={() => setEditingMediaType('file')}
+                      >
+                        📁 Файл
+                      </button>
+                      <button
+                        type="button"
+                        className={`${styles.toggleBtn} ${editingMediaType === 'vk' ? styles.toggleBtnActive : ''}`}
+                        onClick={() => setEditingMediaType('vk')}
+                      >
+                        🔗 VK
+                      </button>
                     </div>
-                   <FileInput
-  accept="image/*"
-  onChange={(file, preview) => {
-    setEditingImage(file);
-    setEditingImagePreview(preview);
-    setEditingNews({ ...editingNews!, image: preview });
-  }}
-  preview={editingImagePreview || editingNews?.image}
-  label="Новое изображение"
-/>
+                    
+                    {editingMediaType === 'file' ? (
+                      <>
+                        <div className={styles.imagePreview}>
+                          {(editingImagePreview || editingNews.image) && (
+                            editingNews.mediaType === 'video' && editingNews.videoUrl ? (
+                              <video 
+                                src={editingImagePreview || editingNews.videoUrl} 
+                                className={styles.previewImg} 
+                                controls 
+                              />
+                            ) : (
+                              <img 
+                                src={editingImagePreview || editingNews.image} 
+                                alt="Preview" 
+                                className={styles.previewImg}
+                              />
+                            )
+                          )}
+                        </div>
+                        <FileInput
+                          accept="image/*,video/*"
+                          onChange={(file, preview) => {
+                            setEditingImage(file);
+                            setEditingImagePreview(preview);
+                            const isVideo = file?.type.startsWith('video/');
+                            setEditingNews({ 
+                              ...editingNews!, 
+                              image: isVideo ? '' : preview,
+                              videoUrl: isVideo ? preview : undefined,
+                              mediaType: isVideo ? 'video' : 'image'
+                            });
+                          }}
+                          preview={editingImagePreview || (editingNews?.mediaType === 'video' ? editingNews.videoUrl : editingNews?.image)}
+                          label="Фото или видео"
+                        />
+                      </>
+                    ) : (
+                      <div className={styles.vkLinkField}>
+                        <input
+                          type="url"
+                          value={editingVkLink || editingNews.image}
+                          onChange={(e) => {
+                            setEditingVkLink(e.target.value);
+                            const isVideo = e.target.value.includes('vk.com/video');
+                            setEditingNews({
+                              ...editingNews,
+                              image: isVideo ? '' : e.target.value,
+                              videoUrl: isVideo ? e.target.value : undefined,
+                              mediaType: isVideo ? 'video' : 'image'
+                            });
+                          }}
+                          className={styles.input}
+                          placeholder="Ссылка на фото или видео из VK"
+                        />
+                        {(editingVkLink || editingNews.image) && editingNews.mediaType !== 'video' && (
+                          <div className={styles.vkPreview}>
+                            <img 
+                              src={editingVkLink || editingNews.image} 
+                              alt="VK Preview" 
+                              className={styles.previewImg} 
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className={styles.formActions}>
@@ -225,7 +371,9 @@ export default function AdminNews({ news: initialNews = [], onSave }: AdminNewsP
                       className={styles.editBtn}
                       onClick={() => {
                         setEditingNews(item);
-                        setEditingImagePreview(item.image);
+                        setEditingImagePreview(item.mediaType === 'video' ? (item.videoUrl || '') : item.image);
+                        setEditingMediaType(item.videoUrl?.includes('vk.com') || item.image?.includes('vk.com') ? 'vk' : 'file');
+                        setEditingVkLink(item.videoUrl?.includes('vk.com') || item.image?.includes('vk.com') ? (item.videoUrl || item.image) : '');
                       }}
                     >
                       ✏️

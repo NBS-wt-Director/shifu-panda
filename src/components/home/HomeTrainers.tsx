@@ -69,14 +69,14 @@ export default function HomeTrainers({
                       <h3 className="text-lg font-bold text-gray-900">{trainer.name}</h3>
                       <div className="flex gap-2">
                         <button 
-                          className="flex-1 px-4 py-2 bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-700 transition-all"
+                          className="flex-1 px-4 py-2 bg-red-600 text-white font-semibold text-sm hover:bg-red-700 transition-all"
                           onClick={() => openCallModal(`Тренер ${trainer.name}`)}
                         >
                           Записаться
                         </button>
                         <Link 
                           href={`/trainers/${trainer.id}`}
-                          className="px-4 py-2 bg-white text-emerald-600 font-semibold text-sm border-2 border-emerald-600 hover:bg-emerald-600 hover:text-white transition-all"
+                          className="px-4 py-2 bg-white text-red-600 font-semibold text-sm border-2 border-red-600 hover:bg-red-600 hover:text-white transition-all"
                         >
                           Подробнее
                         </Link>

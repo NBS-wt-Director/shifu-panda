@@ -66,7 +66,7 @@ export default function GridSettings({ defaultCols = 3, onChange }: GridSettings
           onClick={() => handleChange(n)}
           className={`px-4 py-2 rounded-lg font-semibold transition-all ${
             cols === n
-              ? 'bg-emerald-600 text-white shadow-md'
+              ? 'bg-blue-600 text-white shadow-md'
               : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'
           }`}
         >

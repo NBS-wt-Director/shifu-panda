@@ -180,7 +180,7 @@ export default function ProgramPage({ params }: { params: Promise<{ id: string }
             </h2>
             <div className="flex flex-wrap justify-center gap-4">
               {program.workouts.map((workout: any, idx: number) => (
-                <div key={idx} className="flex items-center gap-3 bg-gradient-to-r from-emerald-500 to-green-500 px-6 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all text-white">
+                <div key={idx} className="flex items-center gap-3 bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all text-white">
                   <div className="bg-white/20 px-3 py-1 rounded-lg font-bold">
                     {workout.day}
                   </div>

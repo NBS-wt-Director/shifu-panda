@@ -8,6 +8,8 @@ interface NewsItem {
   title:string,
   text: string;
   description: string;
+  videoUrl?: string;
+  mediaType?: 'image' | 'video';
 }
 
 interface HomeNewsProps {
@@ -34,15 +36,24 @@ export default function HomeNews({
               <div key={item.id} className="group cursor-pointer hover:scale-[1.02] transition-transform duration-300">
                 <div 
                   className="w-full h-96 bg-gray-100 rounded-br-[1%] overflow-hidden shadow-2xl group-hover:shadow-3xl transition-all duration-500 hover:-translate-y-2 relative"
-                  onClick={() => openImageModal(item.image, item.text)}
+                  onClick={() => item.mediaType === 'video' ? null : openImageModal(item.image, item.text)}
                 >
-                  <Image
-                    src={item.image}
-                    alt={item.text}
-                    width={400}
-                    height={400}
-                    className="w-full h-full object-contain hover:scale-105 transition-transform duration-500"
-                  />
+                  {item.mediaType === 'video' ? (
+                    <video
+                      src={item.videoUrl || item.image}
+                      className="w-full h-full object-contain hover:scale-105 transition-transform duration-500"
+                      controls
+                      preload="metadata"
+                    />
+                  ) : (
+                    <Image
+                      src={item.image}
+                      alt={item.text}
+                      width={400}
+                      height={400}
+                      className="w-full h-full object-contain hover:scale-105 transition-transform duration-500"
+                    />
+                  )}
                 </div>
                 <div className="mt-6 p-6 bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
                   <h3 className="text-2xl font-bold text-gray-900 mb-4 line-clamp-2 leading-tight">

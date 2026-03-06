@@ -17,6 +17,12 @@ import AdminStatsContainer from '@/components/admin/AdminStatsContainer';
 import AdminDividers from '@/components/admin/AdminDividers';
 import AdminAdditionalContacts from '@/components/admin/AdminAdditionalContacts';
 import AdminHeaderSettings from '@/components/admin/AdminHeaderSettings';
+import AdminDesign from '@/components/admin/AdminDesign';
+import AdminHomeContainer from '@/components/admin/AdminHomeContainer';
+import AdminHomeProgramsContainer from '@/components/admin/AdminHomeProgramsContainer';
+import AdminHomeTrainersContainer from '@/components/admin/AdminHomeTrainersContainer';
+import AdminProgramsPageContainer from '@/components/admin/AdminProgramsPageContainer';
+import AdminTrainersPageContainer from '@/components/admin/AdminTrainersPageContainer';
 import styles from './page.module.css';
 
 export default function AdminPage() {
@@ -30,7 +36,13 @@ export default function AdminPage() {
   const [changesCount, setChangesCount] = useState(0);
     const     tabConfig = {
     header: { component: 'header' },
+    homeContainer: { component: 'homeContainer' },
+    homePrograms: { component: 'homePrograms' },
+    homeTrainers: { component: 'homeTrainers' },
     programs: { component: 'programs' },
+    programsCards: { component: 'programsCards' },
+    trainers: { component: 'trainers' },
+    trainersCards: { component: 'trainersCards' },
     sliders: { component: 'slider' }, 
     schedulePrices: { component: 'schedulePrices' },
     workouts: { component: 'workouts' },
@@ -44,6 +56,7 @@ export default function AdminPage() {
     stats: { component: 'stats' },
     autoupload: {  component: 'autoupload',},
     files: { component: 'files' },
+    design: { component: 'design' },
   };
 
 
@@ -389,6 +402,94 @@ const defaultSections = [
     <AdminStatsContainer />
   ) : currentConfig.component === 'files' ? (
     <AdminStorage />
+  ) : currentConfig.component === 'design' ? (
+    <AdminDesign 
+      designSettings={dbData.designSettings || null}
+      onSave={(newDesignSettings: any) => {
+        const newData = { ...dbData, designSettings: newDesignSettings };
+        setDbData(newData);
+        updateChangesCount(newData);
+      }}
+    />
+  ) : currentConfig.component === 'homeContainer' ? (
+    <AdminHomeContainer 
+      data={dbData.homeContainerSettings || {}}
+      onSave={(newSettings) => {
+        const newData = { ...dbData, homeContainerSettings: newSettings };
+        setDbData(newData);
+        updateChangesCount(newData);
+      }}
+    />
+  ) : currentConfig.component === 'homePrograms' ? (
+    <AdminHomeProgramsContainer 
+      containerSettings={dbData.homeProgramsContainerSettings || {}}
+      cardSettings={dbData.homeProgramsCardSettings || {}}
+      onSave={(containerSettings, cardSettings) => {
+        const newData = { 
+          ...dbData, 
+          homeProgramsContainerSettings: containerSettings,
+          homeProgramsCardSettings: cardSettings
+        };
+        setDbData(newData);
+        updateChangesCount(newData);
+      }}
+    />
+  ) : currentConfig.component === 'homeTrainers' ? (
+    <AdminHomeTrainersContainer 
+      containerSettings={dbData.homeTrainersContainerSettings || {}}
+      cardSettings={dbData.homeTrainersCardSettings || {}}
+      onSave={(containerSettings, cardSettings) => {
+        const newData = { 
+          ...dbData, 
+          homeTrainersContainerSettings: containerSettings,
+          homeTrainersCardSettings: cardSettings
+        };
+        setDbData(newData);
+        updateChangesCount(newData);
+      }}
+    />
+  ) : currentConfig.component === 'programsCards' ? (
+    <AdminProgramsPageContainer 
+      containerSettings={dbData.programsPageContainerSettings || {}}
+      cardSettings={dbData.programsPageCardSettings || {}}
+      onSave={(containerSettings, cardSettings) => {
+        const newData = { 
+          ...dbData, 
+          programsPageContainerSettings: containerSettings,
+          programsPageCardSettings: cardSettings
+        };
+        setDbData(newData);
+        updateChangesCount(newData);
+      }}
+    />
+  ) : currentConfig.component === 'trainers' ? (
+    <AdminTrainersPageContainer 
+      containerSettings={dbData.trainersPageContainerSettings || {}}
+      cardSettings={dbData.trainersPageCardSettings || {}}
+      onSave={(containerSettings, cardSettings) => {
+        const newData = { 
+          ...dbData, 
+          trainersPageContainerSettings: containerSettings,
+          trainersPageCardSettings: cardSettings
+        };
+        setDbData(newData);
+        updateChangesCount(newData);
+      }}
+    />
+  ) : currentConfig.component === 'trainersCards' ? (
+    <AdminTrainersPageContainer 
+      containerSettings={dbData.trainersPageContainerSettings || {}}
+      cardSettings={dbData.trainersPageCardSettings || {}}
+      onSave={(containerSettings, cardSettings) => {
+        const newData = { 
+          ...dbData, 
+          trainersPageContainerSettings: containerSettings,
+          trainersPageCardSettings: cardSettings
+        };
+        setDbData(newData);
+        updateChangesCount(newData);
+      }}
+    />
   ) : (
     <h1>Секция в разработке!</h1>
   )}

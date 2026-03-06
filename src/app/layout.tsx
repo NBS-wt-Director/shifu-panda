@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/Header';
+import SiteStyles from '@/components/SiteStyles';
 
 const inter = Inter({ 
   subsets: ['latin', 'cyrillic'], 
@@ -22,6 +23,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru">
+      <SiteStyles />
       <body className={`${inter.variable} font-panda antialiased`}>
      
         <main>{children}</main>

@@ -41,17 +41,22 @@
 
 .homeMenuItem {
   display: block;
+  width: 100%;
+  text-align: left;
   padding: 0.75rem 1rem;
   color: #374151;
   text-decoration: none;
   font-weight: 500;
   border-radius: 8px;
   transition: all 0.2s;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 .homeMenuItem:hover {
-  background: #d1fae5;
-  color: #059669;
+  background: #dbeafe;
+  color: #3b82f6;
 }
 
 .logoLink {
@@ -76,7 +81,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.625rem 1rem;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -89,7 +94,7 @@
 
 .callButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
 /* 3. ЗАГОЛОВОК */
@@ -258,8 +263,8 @@
 }
 
 .menuItem:hover {
-  background: #d1fae5;
-  color: #059669;
+  background: #dbeafe;
+  color: #3b82f6;
 }
 
 .menuDivider {
@@ -290,8 +295,8 @@
 }
 
 .menuItemButton:hover {
-  background: #d1fae5;
-  color: #059669;
+  background: #dbeafe;
+  color: #3b82f6;
 }
 
 .submenuChevron {
@@ -309,17 +314,22 @@
 
 .submenuItem {
   display: block;
+  width: 100%;
+  text-align: left;
   padding: 0.5rem 1rem;
   color: #6b7280;
   text-decoration: none;
   font-size: 0.875rem;
   border-radius: 6px;
   transition: all 0.2s;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 .submenuItem:hover {
   background: #f3f4f6;
-  color: #059669;
+  color: #3b82f6;
 }
 
 /* Мобильная кнопка */
@@ -370,8 +380,8 @@
 }
 
 .mobileMenuItem:hover {
-  background: #d1fae5;
-  color: #059669;
+  background: #dbeafe;
+  color: #3b82f6;
 }
 
 .mobileSubTitle {
@@ -391,7 +401,7 @@
   width: 100%;
   margin-top: 1rem;
   padding: 1rem;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
   border: none;
   border-radius: 8px;

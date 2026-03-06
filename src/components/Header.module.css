@@ -50,7 +50,7 @@
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
 .logoPlaceholder {
-  width: 40px; height: 40px; background: linear-gradient(135deg, #059669, #047857);
+  width: 40px; height: 40px; background: linear-gradient(135deg, #3b82f6, #2563eb);
   border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;
   font-weight: 900; font-size: 1rem; color: white;
 }
@@ -67,7 +67,7 @@
   text-decoration: none;
 }
 .navLink:hover { 
-  color: #059669; background-color: rgba(5,150,105,0.1); 
+  color: #3b82f6; background-color: rgba(59,130,246,0.1); 
 }
 
 .dropdown { position: relative; display: inline-block; }
@@ -76,7 +76,7 @@
   color: #1f2937; background-color: transparent; transition: all 0.2s ease;
   display: flex; align-items: center; gap: 0.25rem; font-size: 0.95rem;
 }
-.dropdownToggle:hover { background-color: #d1fae5; color: #059669; }
+.dropdownToggle:hover { background-color: #dbeafe; color: #3b82f6; }
 
 .dropdownMenu {
   position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%);
@@ -92,10 +92,10 @@
   display: block; padding: 0.625rem 1rem; color: #374151; font-weight: 500;
   border-left: 3px solid transparent; transition: all 0.2s ease; text-decoration: none;
 }
-.dropdownLink:hover { background-color: #d1fae5; color: #059669; border-left-color: #10b981; }
+.dropdownLink:hover { background-color: #dbeafe; color: #3b82f6; border-left-color: #3b82f6; }
 .dropdownHeader {
-  background: linear-gradient(to right, #d1fae5, #a7f3d0) !important;
-  font-weight: 700 !important; color: #059669 !important; border-left-color: #10b981 !important;
+  background: linear-gradient(to right, #dbeafe, #bfdbfe) !important;
+  font-weight: 700 !important; color: #3b82f6 !important; border-left-color: #3b82f6 !important;
 }
 
 .mobileMenu {
@@ -114,17 +114,17 @@
   display: block; padding: 1rem; font-size: 1.125rem; font-weight: 600;
   color: #1f2937; border-radius: 0.75rem; transition: all 0.2s ease; text-decoration: none;
 }
-.mobileNavLink:hover { background-color: #d1fae5; color: #059669; }
+.mobileNavLink:hover { background-color: #dbeafe; color: #3b82f6; }
 .mobileDropdown { position: relative; margin-bottom: 0.5rem; }
 .mobileDropdownToggle {
   display: block; padding: 1rem; font-size: 1.125rem; font-weight: 700;
   color: #1f2937; cursor: pointer; border-radius: 0.75rem; transition: all 0.2s ease;
-  border-left: 4px solid #10b981;
+  border-left: 4px solid #3b82f6;
 }
-.mobileDropdownToggle:hover { background-color: #d1fae5; color: #059669; }
+.mobileDropdownToggle:hover { background-color: #dbeafe; color: #3b82f6; }
 .mobileDropdownMenu {
   margin-top: 0.5rem; margin-left: 1.5rem; background-color: #f8fafc; 
-  border-radius: 0.75rem; padding: 0.75rem; border: 1px solid #d1fae5;
+  border-radius: 0.75rem; padding: 0.75rem; border: 1px solid #dbeafe;
   max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
 }
 .mobileDropdownToggle.active + .mobileDropdownMenu { max-height: 400px; }
@@ -132,7 +132,7 @@
   display: block; padding: 0.75rem 1rem; color: #475569; font-size: 1rem;
   border-radius: 0.5rem; transition: all 0.2s ease; text-decoration: none; margin-bottom: 0.25rem;
 }
-.mobileDropdownLink:hover { background-color: #a7f3d0; color: #059669; }
+.mobileDropdownLink:hover { background-color: #bfdbfe; color: #3b82f6; }
 .mobileCallButton {
   margin: 1.5rem; padding: 1rem 1.5rem; background: linear-gradient(to right, #fbbf24, #f59e0b);
   color: #1f2937; font-weight: 700; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(251,191,36,0.4);
